@@ -1,1 +1,649 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREENBOYZ | Streetwear NFT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: '#CCFF00',
+                        dark: '#050505',
+                        graydark: '#111111',
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    },
+                    animation: {
+                        'marquee': 'marquee 25s linear infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'diagonal': 'diagonal 40s linear infinite',
+                    },
+                    keyframes: {
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                        diagonal: {
+                            '0%': { backgroundPosition: '0px 0px' },
+                            '100%': { backgroundPosition: '-600px -600px' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
 
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #CCFF00;
+        }
+
+        /* Utilities for Design */
+        .border-neon-glow {
+            border: 1px solid rgba(204, 255, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .border-neon-glow:hover {
+            border-color: #CCFF00;
+            box-shadow: 0 0 20px rgba(204, 255, 0, 0.15);
+        }
+        
+        .text-outline {
+            color: transparent;
+            -webkit-text-stroke: 1px #CCFF00;
+        }
+
+        .clip-path-slant {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+        }
+
+        /* Hide scrollbar for marquee container but keep functionality */
+        .marquee-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Custom Spray Cursor */
+        .cursor-spray {
+            cursor: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg') 12 12, crosshair;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-neon selection:text-black font-sans relative">
+
+    <!-- Loading Screen -->
+    <div id="loader" class="fixed inset-0 z-[100] bg-neon flex flex-col items-center justify-center transition-opacity duration-700 opacity-100">
+        <div class="relative">
+            <!-- Logo baru tanpa lingkaran hitam -->
+            <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/GB%20logo.svg" alt="Loading" class="w-32 h-32 md:w-48 md:h-48 animate-bounce drop-shadow-2xl">
+        </div>
+        <div id="loading-text" class="mt-10 font-mono font-bold text-black tracking-widest text-lg animate-pulse uppercase">Loading Sector 7G...</div>
+        
+        <!-- Tombol LET'S SKATE (muncul setelah 5 detik) -->
+        <button id="btn-lets-skate" class="hidden mt-8 px-8 py-4 border-4 border-black bg-transparent text-black font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-all animate-pulse text-xl">
+            Let's Skate!
+        </button>
+    </div>
+
+    <!-- Spray Page (Muncu setelah klik Let's Skate) -->
+    <div id="spray-page" class="fixed inset-0 z-[90] bg-black hidden flex-col items-center justify-center transition-opacity duration-1000 opacity-100 cursor-none">
+        <!-- Logo Text Tersembunyi di belakang canvas -->
+        <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="absolute w-4/5 md:w-1/2 max-w-2xl opacity-100 pointer-events-none drop-shadow-[0_0_20px_rgba(204,255,0,0.4)]">
+        
+        <div id="spray-instruction" class="absolute top-24 text-neon font-mono text-sm tracking-widest animate-pulse pointer-events-none text-center z-10">
+            [ SPRAY THE WALL ]<br><span class="text-xs text-gray-500 mt-2 block">Use cursor/finger to scratch the black screen</span>
+        </div>
+
+        <!-- Canvas untuk efek Spray/Scratch -->
+        <canvas id="spray-canvas" class="absolute inset-0 w-full h-full cursor-none touch-none"></canvas>
+
+        <!-- Custom JS Cursor for Spray -->
+        <img id="custom-spray-cursor" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg" class="fixed pointer-events-none z-[100] w-12 h-12 -translate-x-[50%] -translate-y-[50%] opacity-0 transition-opacity duration-150 drop-shadow-[0_0_8px_rgba(204,255,0,0.6)]">
+    </div>
+
+    <!-- Global Continuous Diagonal Pattern Background -->
+    <div class="fixed inset-0 z-[-5] bg-dark pointer-events-none">
+        <div class="absolute inset-0 bg-[url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gblogo.jpg')] bg-repeat animate-diagonal grayscale opacity-[0.08] mix-blend-lighten" style="background-size: 300px 300px;"></div>
+    </div>
+
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4 px-6 md:px-12 border-b border-transparent">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2">
+                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-8 md:h-10">
+            </a>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wide">
+                <a href="#home" class="hover:text-neon transition-colors">HOME</a>
+                <a href="#collection" class="hover:text-neon transition-colors">COLLECTION</a>
+                <a href="#roadmap" class="hover:text-neon transition-colors">ROADMAP</a>
+                <a href="#merch" class="hover:text-neon transition-colors">MERCH</a>
+                <a href="#wl" class="hover:text-neon transition-colors">WL APP</a>
+            </div>
+
+            <!-- Mobile Menu Button -->
+            <button class="md:hidden text-white focus:outline-none" id="mobile-menu-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-dark/95 backdrop-blur-md border-b border-graydark p-6 flex flex-col space-y-4">
+             <a href="#home" class="hover:text-neon transition-colors font-bold">HOME</a>
+             <a href="#collection" class="hover:text-neon transition-colors font-bold">COLLECTION</a>
+             <a href="#roadmap" class="hover:text-neon transition-colors font-bold">ROADMAP</a>
+             <a href="#merch" class="hover:text-neon transition-colors font-bold">MERCH</a>
+             <a href="#wl" class="hover:text-neon transition-colors font-bold">WL APP</a>
+        </div>
+    </nav>
+
+    <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent">
+        <!-- Abstract Parallax Background Elements -->
+        <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
+            <!-- Grid overlay -->
+            <div class="absolute inset-0" style="background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px); background-size: 50px 50px; opacity: 0.3;"></div>
+            
+            <!-- Floating Elements (Mouse Parallax) -->
+            <div class="absolute top-1/4 left-1/4 w-64 h-64 border border-neon/30 rounded-full mouse-parallax" data-speed="-2"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 border border-white/5 rotate-45 mouse-parallax" data-speed="3"></div>
+            <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-neon/5 blur-3xl rounded-full mouse-parallax" data-speed="1"></div>
+            <div class="absolute bottom-1/3 left-1/3 text-neon/20 font-mono text-xs mouse-parallax" data-speed="-4">
+                GREENBOYZ // <br> SECTOR 7G <br> ROBBINHOOD
+            </div>
+        </div>
+
+        <!-- Main Hero Content (Scroll Parallax) -->
+        <div class="relative z-10 text-center w-full max-w-6xl px-4 flex flex-col items-center">
+            <h2 class="text-neon tracking-widest text-sm md:text-base font-bold mb-4 uppercase scroll-parallax" data-speed="0.2">
+                [ HAND-DRAWN collection ]
+            </h2>
+            
+            <div class="relative scroll-parallax" data-speed="0.4">
+                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase relative z-10">
+                    GREEN<span class="text-neon">BOYZ</span>
+                </h1>
+                <!-- Glitch/Echo effect text behind -->
+                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
+                    GREENBOYZ
+                </h1>
+            </div>
+
+            <p class="mt-8 text-gray-400 max-w-lg mx-auto text-sm md:text-base scroll-parallax" data-speed="0.6">
+                Hand-drawn Digital identity. A collection of 1111 high-end fashion avatars redefining streetwear on the blockchain.
+            </p>
+
+            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center scroll-parallax" data-speed="0.8">
+                <a href="#wl" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
+                    Join Allowlist
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+                <a href="#collection" class="bg-transparent border border-gray-600 text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
+                    Explore Drops
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce opacity-50">
+            <span class="text-xs tracking-widest uppercase mb-2">Scroll</span>
+            <div class="w-px h-12 bg-gradient-to-b from-neon to-transparent"></div>
+        </div>
+    </header>
+
+    <div class="bg-neon text-black py-3 overflow-hidden flex flex-nowrap border-y border-white/20">
+        <!-- First group -->
+        <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4">
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+        </div>
+        <!-- Second group (duplicate for seamless loop) -->
+        <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4" aria-hidden="true">
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+        </div>
+    </div>
+
+    <section id="collection" class="py-24 px-6 md:px-12 bg-transparent relative">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                <div>
+                    <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// GENESIS DROP</h3>
+                    <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">The <span class="text-outline">Collection</span></h2>
+                </div>
+                <p class="text-gray-400 max-w-md text-sm">
+                    Each avatar is procedurally generated from over 300 hand-drawn streetwear traits. Hoodies, sneakers, tech-wear, and artifacts.
+                </p>
+            </div>
+
+            <!-- Single Frame for GIF -->
+            <div class="flex justify-center w-full">
+                <div class="group relative border-neon-glow bg-graydark p-4 flex flex-col h-[400px] w-full max-w-sm">
+                    <div class="w-full h-full bg-dark flex items-center justify-center overflow-hidden relative border border-white/5">
+                        <!-- Placeholder for GIF File -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-black"></div>
+                        
+                        <div class="text-center z-10 flex flex-col items-center justify-center text-gray-500 group-hover:text-neon transition-colors duration-300">
+                            <svg class="w-12 h-12 mb-4 animate-pulse-slow mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="font-mono text-sm tracking-widest">[ .GIF ASSET HERE ]</span>
+                        </div>
+                        
+                        <!-- Tech decorations -->
+                        <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-neon/50"></div>
+                        <div class="absolute top-2 right-2 w-4 h-4 border-t border-r border-neon/50"></div>
+                        <div class="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-neon/50"></div>
+                        <div class="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-neon/50"></div>
+                    </div>
+                    <div class="mt-4 flex justify-between items-center uppercase text-sm font-bold">
+                        <span>Genesis Avatar</span>
+                        <span class="text-neon font-mono text-xs">1111 SUPPLY</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-16 text-center">
+                 <a href="#" class="inline-block border-b border-neon text-neon uppercase font-bold tracking-widest hover:text-white hover:border-white transition-colors pb-1">View Full Gallery</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="roadmap" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden">
+        <!-- Blueprint Grid Background -->
+        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(204,255,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(204,255,0,0.5) 1px, transparent 1px); background-size: 50px 50px;"></div>
+
+        <!-- Parallax Background Text -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-5">
+            <h2 class="text-[15vw] font-bold uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
+        </div>
+
+        <div class="max-w-5xl mx-auto relative z-10">
+            <div class="text-center mb-16">
+                <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// THE ROUTE</h3>
+                <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">Skate <span class="text-outline">Blueprint</span></h2>
+            </div>
+
+            <div class="relative w-full py-10">
+                <!-- SVG Skate Route Path (Desktop Only) -->
+                <div class="absolute inset-0 hidden md:block w-full h-full pointer-events-none">
+                    <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Blueprint dimension lines -->
+                        <path d="M 0 100 L 1000 100" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
+                        <path d="M 0 350 L 1000 350" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
+                        <path d="M 0 600 L 1000 600" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
+                        
+                        <!-- Main Skate Route Line (S-Curve Ramp) -->
+                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
+                        <!-- Outline glow for neon effect -->
+                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
+                        
+                        <!-- Route nodes -->
+                        <circle cx="150" cy="50" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
+                        <circle cx="850" cy="350" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
+                        <circle cx="150" cy="650" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
+                    </svg>
+                </div>
+
+                <!-- Phase Items placed along the route (Mobile linear, Desktop mapped to SVG) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0 relative">
+                    
+                    <!-- Phase 1 -->
+                    <div class="relative md:absolute md:top-[0px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
+                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">01</div>
+                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Drop In</h4>
+                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Establishment</h3>
+                        <p class="text-gray-400 text-xs md:text-sm">Community building, core team dox, and initial sneak peeks of the 1111 collection. WL application opens for early supporters.</p>
+                        <!-- Tech spec decorations -->
+                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">RAMP_A // X150:Y50</div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="relative md:absolute md:top-[300px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
+                        <div class="absolute -top-4 -right-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">02</div>
+                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">The Grind</h4>
+                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Mint</h3>
+                        <p class="text-gray-400 text-xs md:text-sm">Minting phase for WL and Public. Reveal happens 48 hours post-mint. Secondary market listings & rarity sniper integration.</p>
+                        <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">BOWL_B // X850:Y350</div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="relative md:absolute md:top-[600px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
+                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">03</div>
+                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Air Time</h4>
+                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Phygital Merch</h3>
+                        <p class="text-gray-400 text-xs md:text-sm">Holders claim physical streetwear items matching their NFT. NFC tags embedded for blockchain verification on the streets.</p>
+                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">PIPE_C // X150:Y650</div>
+                    </div>
+
+                    <!-- Layout Spacer for desktop to match absolute heights -->
+                    <div class="hidden md:block w-full h-[750px] pointer-events-none"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="merch" class="py-24 px-6 md:px-12 bg-transparent">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+            <!-- Image Side -->
+            <div class="w-full lg:w-1/2 relative group">
+                <!-- Decorative background elements -->
+                <div class="absolute inset-0 bg-neon translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500"></div>
+                
+                <div class="bg-graydark aspect-square w-full border border-white/10 flex items-center justify-center relative overflow-hidden">
+                    <div class="text-center z-10">
+                        <div class="w-32 h-48 border-2 border-neon/50 mx-auto mb-4 relative">
+                            <!-- Hoodie Placeholder Graphic -->
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-8 border-b-2 border-neon/50 rounded-b-full"></div>
+                            <div class="absolute top-8 left-1/4 w-1/2 h-full border-t-2 border-neon/50"></div>
+                        </div>
+                        <h4 class="uppercase tracking-widest font-bold text-xl text-white">Genesis Hoodie</h4>
+                        <p class="text-neon font-mono text-sm mt-2">NFC ENABLED // NFC-001</p>
+                    </div>
+                    <!-- Glitch lines -->
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSJ0cmFuc3BhcmVudCI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDRaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-30"></div>
+                </div>
+            </div>
+
+            <!-- Text Side -->
+            <div class="w-full lg:w-1/2">
+                <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// HOLDER EXCLUSIVE</h3>
+                <h2 class="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-6">Wear Your <br><span class="text-outline">Digital Asset</span></h2>
+                <p class="text-gray-400 mb-8 text-lg">
+                    We are not just a JPEG. GREENBOYZ is a lifestyle brand. Every NFT in the genesis collection acts as a mint pass for our premium, NFC-enabled physical streetwear drops. Scan the tag on your hoodie to prove ownership on-chain.
+                </p>
+                
+                <ul class="space-y-4 mb-10 text-sm font-mono text-gray-300">
+                    <li class="flex items-center gap-3">
+                        <span class="text-neon">✓</span> Heavyweight 450gsm French Terry
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-neon">✓</span> Embedded Secure NFC Chip
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-neon">✓</span> Exclusive to NFT Holders Only
+                    </li>
+                </ul>
+
+                <button class="bg-transparent border border-white text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
+                    View Lookbook
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="wl" class="py-24 px-6 md:px-12 bg-neon text-black clip-path-slant relative -mb-10 pt-32 pb-40 z-20">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-5xl md:text-7xl font-bold uppercase tracking-tighter mb-6">Join <br>GREENBOYZ</h2>
+            <p class="font-medium max-w-xl mx-auto mb-10">Allowlist spots are limited and hand-picked. Connect your Twitter and Discord to apply for the Genesis Mint.</p>
+            
+            <form class="max-w-md mx-auto space-y-4" onsubmit="event.preventDefault(); alert('Form submitted! (Demo only)');">
+                <input type="email" placeholder="ENTER EMAIL ADDRESS" class="w-full bg-black text-white px-6 py-4 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-white border border-black placeholder:text-gray-600" required>
+                <div class="grid grid-cols-2 gap-4">
+                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">
+                        Discord
+                    </button>
+                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">
+                        Twitter
+                    </button>
+                </div>
+                <button type="submit" class="w-full bg-transparent border-2 border-black text-black px-6 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-colors mt-4">
+                    Submit Application
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="bg-black pt-24 pb-8 px-6 md:px-12 border-t border-white/10 relative z-10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <a href="#" class="flex items-center gap-2">
+                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-6 md:h-8">
+            </a>
+            
+            <div class="flex gap-6 font-mono text-sm text-gray-500">
+                <a href="#" class="hover:text-neon transition-colors">Opensea</a>
+                <a href="#" class="hover:text-neon transition-colors">Twitter</a>
+                <a href="#" class="hover:text-neon transition-colors">Discord</a>
+                <a href="#" class="hover:text-neon transition-colors">Etherscan</a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-8 text-center md:text-left text-gray-700 text-xs font-mono">
+            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED. NOT FINANCIAL ADVICE.
+        </div>
+    </footer>
+
+    <script>
+        // 1. Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // 2. Navbar Background on Scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-dark/90', 'backdrop-blur-md', 'border-white/10');
+                navbar.classList.remove('py-4', 'border-transparent');
+                navbar.classList.add('py-3');
+            } else {
+                navbar.classList.remove('bg-dark/90', 'backdrop-blur-md', 'border-white/10');
+                navbar.classList.add('py-4', 'border-transparent');
+                navbar.classList.remove('py-3');
+            }
+        });
+
+        // 3. Mouse Parallax Effect (Hero Section)
+        document.addEventListener("mousemove", parallax);
+        function parallax(e) {
+            document.querySelectorAll(".mouse-parallax").forEach(function(move){
+                var moving_value = move.getAttribute("data-speed");
+                // Calculate movement based on mouse position relative to center of screen
+                var x = (e.clientX - window.innerWidth / 2) * moving_value / 100;
+                var y = (e.clientY - window.innerHeight / 2) * moving_value / 100;
+                
+                move.style.transform = "translateX(" + x + "px) translateY(" + y + "px)";
+            });
+        }
+
+        // 4. Scroll Parallax Effect
+        window.addEventListener('scroll', () => {
+            let scroll = window.scrollY;
+            document.querySelectorAll('.scroll-parallax').forEach(el => {
+                let speed = el.getAttribute('data-speed');
+                el.style.transform = `translateY(${scroll * speed}px)`;
+            });
+        });
+
+        // 5. Loading & Spray Page Logic
+        document.body.style.overflow = 'hidden'; // Lock scroll
+
+        const loader = document.getElementById('loader');
+        const loadingText = document.getElementById('loading-text');
+        const btnLetsSkate = document.getElementById('btn-lets-skate');
+        const sprayPage = document.getElementById('spray-page');
+        const canvas = document.getElementById('spray-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let isDrawing = false;
+        let scratchCompleted = false;
+
+        // Munculkan tombol Let's Skate setelah 5 detik
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadingText.classList.add('hidden');
+                btnLetsSkate.classList.remove('hidden');
+            }, 5000);
+        });
+
+        // Transisi dari Loading ke Spray Page
+        btnLetsSkate.addEventListener('click', () => {
+            loader.classList.replace('opacity-100', 'opacity-0');
+            setTimeout(() => {
+                loader.style.display = 'none';
+                sprayPage.classList.remove('hidden');
+                sprayPage.classList.add('flex');
+                initCanvas(); // Mulai siapkan kanvas hitam
+            }, 700);
+        });
+
+        // Setup Canvas 
+        function initCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Cat layar menjadi hitam full
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        window.addEventListener('resize', () => {
+            if (!scratchCompleted && sprayPage.style.display !== 'none') initCanvas();
+        });
+
+        // Posisi kursor / sentuhan
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+            const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        // Fungsi mencoret / Spray (Menghapus warna hitam)
+        function spray(evt) {
+            if (!isDrawing || scratchCompleted) return;
+            evt.preventDefault();
+            
+            const pos = getMousePos(evt);
+            
+            // Mode menghapus kanvas
+            ctx.globalCompositeOperation = 'destination-out';
+            
+            // Efek kuas/spray gradasi agar halus
+            const radGrad = ctx.createRadialGradient(pos.x, pos.y, 10, pos.x, pos.y, 60);
+            radGrad.addColorStop(0, 'rgba(0,0,0,1)');
+            radGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            
+            ctx.fillStyle = radGrad;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 60, 0, Math.PI * 2, false);
+            ctx.fill();
+        }
+
+        // Custom Cursor & Event listeners
+        const customSprayCursor = document.getElementById('custom-spray-cursor');
+
+        // Event listener untuk mouse
+        canvas.addEventListener('mousedown', (e) => { isDrawing = true; spray(e); });
+        canvas.addEventListener('mousemove', (e) => {
+            // Animasi custom cursor mengikuti pergerakan mouse
+            if(!scratchCompleted) {
+                customSprayCursor.style.opacity = '1';
+                customSprayCursor.style.left = e.clientX + 'px';
+                customSprayCursor.style.top = e.clientY + 'px';
+            }
+            spray(e);
+        });
+        canvas.addEventListener('mouseup', () => { isDrawing = false; checkReveal(); });
+        canvas.addEventListener('mouseleave', () => { 
+            isDrawing = false;
+            customSprayCursor.style.opacity = '0'; // Hilangkan kursor saat keluar layar
+        });
+
+        // Event listener untuk touch screen (HP)
+        canvas.addEventListener('touchstart', (e) => { 
+            customSprayCursor.style.opacity = '0'; // Sembunyikan kursor di perangkat sentuh (HP)
+            isDrawing = true; 
+            spray(e); 
+        }, {passive: false});
+        canvas.addEventListener('touchmove', spray, {passive: false});
+        canvas.addEventListener('touchend', () => { isDrawing = false; checkReveal(); });
+
+        // Cek berapa banyak area yang sudah digosok
+        function checkReveal() {
+            if(scratchCompleted) return;
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparent = 0;
+            
+            // Cek sampel pixel untuk optimasi performa
+            for (let i = 3; i < pixels.length; i += 128) {
+                if (pixels[i] < 128) transparent++;
+            }
+            
+            const total = pixels.length / 128;
+            const percentage = (transparent / total) * 100;
+            
+            // Jika sudah digosok sekitar 25% dari layar, anggap selesai
+            if (percentage > 25) {
+                completeSpray();
+            }
+        }
+
+        // Buka Landing Page jika spray selesai
+        function completeSpray() {
+            scratchCompleted = true;
+            document.getElementById('spray-instruction').style.opacity = '0';
+            customSprayCursor.style.opacity = '0'; // Hilangkan cursor
+
+            // Bersihkan sisa kanvas otomatis
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Tunggu 1 detik agar player melihat logo utuh, lalu masuk ke web
+            setTimeout(() => {
+                sprayPage.classList.remove('opacity-100');
+                sprayPage.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    sprayPage.style.display = 'none';
+                    document.body.style.overflow = ''; // Unlock scroll
+                }, 1000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
