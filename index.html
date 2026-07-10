@@ -6,7 +6,7 @@
     <title>GREENBOYZ | Streetwear NFT</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -24,6 +24,8 @@
                         'marquee': 'marquee 25s linear infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'diagonal': 'diagonal 40s linear infinite',
+                        'slime': 'slime 3.5s ease-in-out infinite alternate',
+                        'slime-slow': 'slime 5s ease-in-out infinite alternate-reverse',
                     },
                     keyframes: {
                         marquee: {
@@ -33,6 +35,10 @@
                         diagonal: {
                             '0%': { backgroundPosition: '0px 0px' },
                             '100%': { backgroundPosition: '-600px -600px' },
+                        },
+                        slime: {
+                            '0%': { transform: 'scaleY(0.9)' },
+                            '100%': { transform: 'scaleY(1.3)' },
                         }
                     }
                 }
@@ -128,281 +134,59 @@
         <div class="absolute inset-0 bg-[url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gblogo.jpg')] bg-repeat animate-diagonal grayscale opacity-[0.08] mix-blend-lighten" style="background-size: 300px 300px;"></div>
     </div>
 
-    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-4 px-6 md:px-12 border-b border-transparent">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <!-- Logo -->
+    <!-- Background Audio -->
+    <audio id="bg-music" loop>
+        <source src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/Cartoon%20Kicks.mp3" type="audio/mpeg">
+    </audio>
+
+    <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
+        <!-- Slime Dripping Background Area -->
+        <div class="absolute inset-0 top-0 left-0 w-full pointer-events-none -z-10 flex flex-col drop-shadow-[0_10px_15px_rgba(204,255,0,0.15)]">
+            <div class="w-full bg-neon h-[70px] md:h-[80px]"></div>
+            <!-- SVG ViewBox Height diubah dari 150 ke 250, koordinat Y (kedalaman tetesan) diturunkan hingga 70% lebih panjang -->
+            <svg viewBox="0 0 1000 250" preserveAspectRatio="none" class="w-full h-32 md:h-48 text-neon fill-current -mt-1">
+                <!-- Back layer (slower, different drips for 3D effect) -->
+                <path class="animate-slime-slow origin-top opacity-50" d="M0,0 L1000,0 L1000,50 C950,180 900,10 850,80 C800,150 750,30 700,100 C650,170 600,10 550,60 C500,110 450,220 400,80 C350,-50 300,130 250,200 C200,270 150,50 100,110 C50,180 25,30 0,60 Z"/>
+                <!-- Front layer (faster, main drips) -->
+                <path class="animate-slime origin-top" d="M0,0 L1000,0 L1000,10 C980,50 960,130 940,50 C920,-30 900,10 880,80 C860,150 840,60 820,30 C800,0 780,100 760,180 C740,260 720,30 700,30 C680,30 660,150 640,100 C620,50 600,0 580,30 C560,60 540,230 520,150 C500,60 480,30 460,60 C440,100 420,170 400,100 C380,30 360,10 340,50 C320,80 300,210 280,110 C260,10 240,30 220,80 C200,130 180,50 160,30 C140,10 120,100 100,170 C80,240 60,50 40,30 C20,10 10,60 0,30 Z" />
+            </svg>
+        </div>
+
+        <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-6 md:px-12 relative z-10">
+            <!-- Logo (Now changed to black using CSS filter brightness-0) -->
             <a href="#" class="flex items-center gap-2">
-                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-8 md:h-10">
+                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-8 md:h-10 brightness-0">
             </a>
 
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex space-x-8 items-center text-sm font-semibold tracking-wide">
-                <a href="#home" class="hover:text-neon transition-colors">HOME</a>
-                <a href="#collection" class="hover:text-neon transition-colors">COLLECTION</a>
-                <a href="#roadmap" class="hover:text-neon transition-colors">ROADMAP</a>
-                <a href="#merch" class="hover:text-neon transition-colors">MERCH</a>
-                <a href="#wl" class="hover:text-neon transition-colors">WL APP</a>
-            </div>
-
-            <!-- Mobile Menu Button -->
-            <button class="md:hidden text-white focus:outline-none" id="mobile-menu-btn">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            </button>
-        </div>
-        
-        <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-dark/95 backdrop-blur-md border-b border-graydark p-6 flex flex-col space-y-4">
-             <a href="#home" class="hover:text-neon transition-colors font-bold">HOME</a>
-             <a href="#collection" class="hover:text-neon transition-colors font-bold">COLLECTION</a>
-             <a href="#roadmap" class="hover:text-neon transition-colors font-bold">ROADMAP</a>
-             <a href="#merch" class="hover:text-neon transition-colors font-bold">MERCH</a>
-             <a href="#wl" class="hover:text-neon transition-colors font-bold">WL APP</a>
-        </div>
-    </nav>
-
-    <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent">
-        <!-- Abstract Parallax Background Elements -->
-        <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
-            <!-- Grid overlay -->
-            <div class="absolute inset-0" style="background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px); background-size: 50px 50px; opacity: 0.3;"></div>
-            
-            <!-- Floating Elements (Mouse Parallax) -->
-            <div class="absolute top-1/4 left-1/4 w-64 h-64 border border-neon/30 rounded-full mouse-parallax" data-speed="-2"></div>
-            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 border border-white/5 rotate-45 mouse-parallax" data-speed="3"></div>
-            <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-neon/5 blur-3xl rounded-full mouse-parallax" data-speed="1"></div>
-            <div class="absolute bottom-1/3 left-1/3 text-neon/20 font-mono text-xs mouse-parallax" data-speed="-4">
-                GREENBOYZ // <br> SECTOR 7G <br> ROBBINHOOD
-            </div>
-        </div>
-
-        <!-- Main Hero Content (Scroll Parallax) -->
-        <div class="relative z-10 text-center w-full max-w-6xl px-4 flex flex-col items-center">
-            <h2 class="text-neon tracking-widest text-sm md:text-base font-bold mb-4 uppercase scroll-parallax" data-speed="0.2">
-                [ HAND-DRAWN collection ]
-            </h2>
-            
-            <div class="relative scroll-parallax" data-speed="0.4">
-                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase relative z-10">
-                    GREEN<span class="text-neon">BOYZ</span>
-                </h1>
-                <!-- Glitch/Echo effect text behind -->
-                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
-                    GREENBOYZ
-                </h1>
-            </div>
-
-            <p class="mt-8 text-gray-400 max-w-lg mx-auto text-sm md:text-base scroll-parallax" data-speed="0.6">
-                Hand-drawn Digital identity. A collection of 1111 high-end fashion avatars redefining streetwear on the blockchain.
-            </p>
-
-            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center scroll-parallax" data-speed="0.8">
-                <a href="#wl" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
-                    Join Allowlist
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                </a>
-                <a href="#collection" class="bg-transparent border border-gray-600 text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
-                    Explore Drops
-                </a>
-            </div>
-        </div>
-        
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce opacity-50">
-            <span class="text-xs tracking-widest uppercase mb-2">Scroll</span>
-            <div class="w-px h-12 bg-gradient-to-b from-neon to-transparent"></div>
-        </div>
-    </header>
-
-    <div class="bg-neon text-black py-3 overflow-hidden flex flex-nowrap border-y border-white/20">
-        <!-- First group -->
-        <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4">
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-        </div>
-        <!-- Second group (duplicate for seamless loop) -->
-        <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4" aria-hidden="true">
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-        </div>
-    </div>
-
-    <section id="collection" class="py-24 px-6 md:px-12 bg-transparent relative">
-        <div class="max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-                <div>
-                    <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// GENESIS DROP</h3>
-                    <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">The <span class="text-outline">Collection</span></h2>
-                </div>
-                <p class="text-gray-400 max-w-md text-sm">
-                    Each avatar is procedurally generated from over 300 hand-drawn streetwear traits. Hoodies, sneakers, tech-wear, and artifacts.
-                </p>
-            </div>
-
-            <!-- Single Frame for GIF -->
-            <div class="flex justify-center w-full">
-                <div class="group relative border-neon-glow bg-graydark p-4 flex flex-col h-[400px] w-full max-w-sm">
-                    <div class="w-full h-full bg-dark flex items-center justify-center overflow-hidden relative border border-white/5">
-                        <!-- Placeholder for GIF File -->
-                        <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-black"></div>
-                        
-                        <div class="text-center z-10 flex flex-col items-center justify-center text-gray-500 group-hover:text-neon transition-colors duration-300">
-                            <svg class="w-12 h-12 mb-4 animate-pulse-slow mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <span class="font-mono text-sm tracking-widest">[ .GIF ASSET HERE ]</span>
-                        </div>
-                        
-                        <!-- Tech decorations -->
-                        <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-neon/50"></div>
-                        <div class="absolute top-2 right-2 w-4 h-4 border-t border-r border-neon/50"></div>
-                        <div class="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-neon/50"></div>
-                        <div class="absolute bottom-2 right-2 w-4 h-4 border-b border-r border-neon/50"></div>
-                    </div>
-                    <div class="mt-4 flex justify-between items-center uppercase text-sm font-bold">
-                        <span>Genesis Avatar</span>
-                        <span class="text-neon font-mono text-xs">1111 SUPPLY</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-16 text-center">
-                 <a href="#" class="inline-block border-b border-neon text-neon uppercase font-bold tracking-widest hover:text-white hover:border-white transition-colors pb-1">View Full Gallery</a>
-            </div>
-        </div>
-    </section>
-
-    <section id="roadmap" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden">
-        <!-- Blueprint Grid Background -->
-        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(204,255,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(204,255,0,0.5) 1px, transparent 1px); background-size: 50px 50px;"></div>
-
-        <!-- Parallax Background Text -->
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-5">
-            <h2 class="text-[15vw] font-bold uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
-        </div>
-
-        <div class="max-w-5xl mx-auto relative z-10">
-            <div class="text-center mb-16">
-                <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// THE ROUTE</h3>
-                <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">Skate <span class="text-outline">Blueprint</span></h2>
-            </div>
-
-            <div class="relative w-full py-10">
-                <!-- SVG Skate Route Path (Desktop Only) -->
-                <div class="absolute inset-0 hidden md:block w-full h-full pointer-events-none">
-                    <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Blueprint dimension lines -->
-                        <path d="M 0 100 L 1000 100" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
-                        <path d="M 0 350 L 1000 350" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
-                        <path d="M 0 600 L 1000 600" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
-                        
-                        <!-- Main Skate Route Line (S-Curve Ramp) -->
-                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
-                        <!-- Outline glow for neon effect -->
-                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
-                        
-                        <!-- Route nodes -->
-                        <circle cx="150" cy="50" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
-                        <circle cx="850" cy="350" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
-                        <circle cx="150" cy="650" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
+            <!-- Desktop Menu (Now solid black) -->
+            <div class="hidden md:flex space-x-8 items-center text-sm font-extrabold tracking-wide text-black">
+                <a href="#home" class="hover:opacity-50 transition-opacity">HOME</a>
+                <a href="#collection" class="hover:opacity-50 transition-opacity">COLLECTION</a>
+                <a href="#roadmap" class="hover:opacity-50 transition-opacity">ROADMAP</a>
+                <a href="#merch" class="hover:opacity-50 transition-opacity">MERCH</a>
+                <a href="#wl" class="hover:opacity-50 transition-opacity">WL APP</a>
+                
+                <!-- Music Toggle Button (Desktop) -->
+                <button id="music-toggle-desk" class="text-black hover:opacity-50 transition-opacity focus:outline-none ml-4" title="Toggle Music">
+                    <svg id="music-icon-desk" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Volume ON Icon (Default) -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                </div>
-
-                <!-- Phase Items placed along the route (Mobile linear, Desktop mapped to SVG) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0 relative">
-                    
-                    <!-- Phase 1 -->
-                    <div class="relative md:absolute md:top-[0px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
-                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">01</div>
-                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Drop In</h4>
-                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Establishment</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Community building, core team dox, and initial sneak peeks of the 1111 collection. WL application opens for early supporters.</p>
-                        <!-- Tech spec decorations -->
-                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">RAMP_A // X150:Y50</div>
-                    </div>
-
-                    <!-- Phase 2 -->
-                    <div class="relative md:absolute md:top-[300px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
-                        <div class="absolute -top-4 -right-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">02</div>
-                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">The Grind</h4>
-                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Mint</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Minting phase for WL and Public. Reveal happens 48 hours post-mint. Secondary market listings & rarity sniper integration.</p>
-                        <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">BOWL_B // X850:Y350</div>
-                    </div>
-
-                    <!-- Phase 3 -->
-                    <div class="relative md:absolute md:top-[600px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
-                        <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">03</div>
-                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Air Time</h4>
-                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Phygital Merch</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Holders claim physical streetwear items matching their NFT. NFC tags embedded for blockchain verification on the streets.</p>
-                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">PIPE_C // X150:Y650</div>
-                    </div>
-
-                    <!-- Layout Spacer for desktop to match absolute heights -->
-                    <div class="hidden md:block w-full h-[750px] pointer-events-none"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="merch" class="py-24 px-6 md:px-12 bg-transparent">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
-            <!-- Image Side -->
-            <div class="w-full lg:w-1/2 relative group">
-                <!-- Decorative background elements -->
-                <div class="absolute inset-0 bg-neon translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500"></div>
-                
-                <div class="bg-graydark aspect-square w-full border border-white/10 flex items-center justify-center relative overflow-hidden">
-                    <div class="text-center z-10">
-                        <div class="w-32 h-48 border-2 border-neon/50 mx-auto mb-4 relative">
-                            <!-- Hoodie Placeholder Graphic -->
-                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-8 border-b-2 border-neon/50 rounded-b-full"></div>
-                            <div class="absolute top-8 left-1/4 w-1/2 h-full border-t-2 border-neon/50"></div>
-                        </div>
-                        <h4 class="uppercase tracking-widest font-bold text-xl text-white">Genesis Hoodie</h4>
-                        <p class="text-neon font-mono text-sm mt-2">NFC ENABLED // NFC-001</p>
-                    </div>
-                    <!-- Glitch lines -->
-                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSJ0cmFuc3BhcmVudCI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDRaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-30"></div>
-                </div>
+                </button>
             </div>
 
-            <!-- Text Side -->
-            <div class="w-full lg:w-1/2">
-                <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// HOLDER EXCLUSIVE</h3>
-                <h2 class="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-6">Wear Your <br><span class="text-outline">Digital Asset</span></h2>
-                <p class="text-gray-400 mb-8 text-lg">
-                    We are not just a JPEG. GREENBOYZ is a lifestyle brand. Every NFT in the genesis collection acts as a mint pass for our premium, NFC-enabled physical streetwear drops. Scan the tag on your hoodie to prove ownership on-chain.
-                </p>
+            <div class="flex items-center gap-4 md:hidden">
+                <!-- Music Toggle Button (Mobile) -->
+                <button id="music-toggle-mob" class="text-black hover:opacity-50 transition-opacity focus:outline-none" title="Toggle Music">
+                    <svg id="music-icon-mob" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <!-- Volume ON Icon (Default) -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
                 
-                <ul class="space-y-4 mb-10 text-sm font-mono text-gray-300">
-                    <li class="flex items-center gap-3">
-                        <span class="text-neon">✓</span> Heavyweight 450gsm French Terry
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <span class="text-neon">✓</span> Embedded Secure NFC Chip
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <span class="text-neon">✓</span> Exclusive to NFT Holders Only
-                    </li>
-                </ul>
-
-                <button class="bg-transparent border border-white text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
-                    View Lookbook
+                <!-- Mobile Menu Button (Now Black) -->
+                <button class="text-black focus:outline-none hover:opacity-50 transition-opacity" id="mobile-menu-btn">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
         </div>
@@ -433,6 +217,7 @@
     <footer class="bg-black pt-24 pb-8 px-6 md:px-12 border-t border-white/10 relative z-10">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <a href="#" class="flex items-center gap-2">
+                <!-- Logo footer dibiarkan terang/putih agar terlihat di background hitam pekat -->
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-6 md:h-8">
             </a>
             
@@ -449,6 +234,53 @@
     </footer>
 
     <script>
+        // --- AUDIO CONTROLLER ---
+        const bgMusic = document.getElementById('bg-music');
+        const btnToggleDesk = document.getElementById('music-toggle-desk');
+        const iconDesk = document.getElementById('music-icon-desk');
+        const btnToggleMob = document.getElementById('music-toggle-mob');
+        const iconMob = document.getElementById('music-icon-mob');
+        
+        let isMusicPlaying = false;
+
+        // SVG Path Strings for Audio States
+        const iconVolOn = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+        const iconVolOff = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />';
+
+        // Set default volume slightly lower so it doesn't blast ears
+        bgMusic.volume = 0.5;
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                iconDesk.innerHTML = iconVolOff;
+                iconMob.innerHTML = iconVolOff;
+                isMusicPlaying = false;
+            } else {
+                bgMusic.play();
+                iconDesk.innerHTML = iconVolOn;
+                iconMob.innerHTML = iconVolOn;
+                isMusicPlaying = true;
+            }
+        }
+
+        // Add event listeners to toggle buttons
+        btnToggleDesk.addEventListener('click', toggleMusic);
+        btnToggleMob.addEventListener('click', toggleMusic);
+
+        // Attempt to auto-play on first user interaction anywhere on the screen
+        // (Browsers block audio until the user clicks/touches something)
+        const startAudioOnce = () => {
+            if (!isMusicPlaying) {
+                toggleMusic(); // Turns it on
+            }
+            document.removeEventListener('click', startAudioOnce);
+            document.removeEventListener('touchstart', startAudioOnce);
+        };
+        document.addEventListener('click', startAudioOnce);
+        document.addEventListener('touchstart', startAudioOnce);
+
+
         // 1. Mobile Menu Toggle
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -464,21 +296,7 @@
             });
         });
 
-        // 2. Navbar Background on Scroll
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                navbar.classList.add('bg-dark/90', 'backdrop-blur-md', 'border-white/10');
-                navbar.classList.remove('py-4', 'border-transparent');
-                navbar.classList.add('py-3');
-            } else {
-                navbar.classList.remove('bg-dark/90', 'backdrop-blur-md', 'border-white/10');
-                navbar.classList.add('py-4', 'border-transparent');
-                navbar.classList.remove('py-3');
-            }
-        });
-
-        // 3. Mouse Parallax Effect (Hero Section)
+        // 2. Mouse Parallax Effect (Hero Section)
         document.addEventListener("mousemove", parallax);
         function parallax(e) {
             document.querySelectorAll(".mouse-parallax").forEach(function(move){
@@ -491,7 +309,7 @@
             });
         }
 
-        // 4. Scroll Parallax Effect
+        // 3. Scroll Parallax Effect
         window.addEventListener('scroll', () => {
             let scroll = window.scrollY;
             document.querySelectorAll('.scroll-parallax').forEach(el => {
@@ -500,7 +318,7 @@
             });
         });
 
-        // 5. Loading & Spray Page Logic
+        // 4. Loading & Spray Page Logic
         document.body.style.overflow = 'hidden'; // Lock scroll
 
         const loader = document.getElementById('loader');
