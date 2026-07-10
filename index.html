@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script>
         tailwind.config = {
             theme: {
@@ -46,7 +45,6 @@
             }
         }
     </script>
-
     <style>
         body {
             background-color: #050505;
@@ -92,10 +90,16 @@
         .marquee-container::-webkit-scrollbar {
             display: none;
         }
+
+        /* Custom Spray Cursor */
+        .cursor-spray {
+            cursor: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg') 12 12, crosshair;
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-neon selection:text-black font-sans relative">
 
+    <!-- Loading Screen -->
     <div id="loader" class="fixed inset-0 z-[100] bg-neon flex flex-col items-center justify-center transition-opacity duration-700 opacity-100">
         <div class="relative">
             <!-- Logo baru tanpa lingkaran hitam -->
@@ -103,13 +107,15 @@
         </div>
         <div id="loading-text" class="mt-10 font-mono font-bold text-black tracking-widest text-lg animate-pulse uppercase">Loading Sector 7G...</div>
         
-        <!-- Tombol LET'S SKATE -->
+        <!-- Tombol LET'S SKATE (muncul setelah 5 detik) -->
         <button id="btn-lets-skate" class="hidden mt-8 px-8 py-4 border-4 border-black bg-transparent text-black font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-all animate-pulse text-xl">
             Let's Skate!
         </button>
     </div>
 
+    <!-- Spray Page (Muncu setelah klik Let's Skate) -->
     <div id="spray-page" class="fixed inset-0 z-[90] bg-black hidden flex-col items-center justify-center transition-opacity duration-1000 opacity-100 cursor-none">
+        <!-- Logo Text Tersembunyi di belakang canvas -->
         <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="absolute w-4/5 md:w-1/2 max-w-2xl opacity-100 pointer-events-none drop-shadow-[0_0_20px_rgba(204,255,0,0.4)]">
         
         <div id="spray-instruction" class="absolute top-24 text-neon font-mono text-sm tracking-widest animate-pulse pointer-events-none text-center z-10">
@@ -123,30 +129,28 @@
         <img id="custom-spray-cursor" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg" class="fixed pointer-events-none z-[100] w-12 h-12 -translate-x-[50%] -translate-y-[50%] opacity-0 transition-opacity duration-150 drop-shadow-[0_0_8px_rgba(204,255,0,0.6)]">
     </div>
 
+    <!-- Global Continuous Diagonal Pattern Background -->
     <div class="fixed inset-0 z-[-5] bg-dark pointer-events-none">
         <div class="absolute inset-0 bg-[url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gblogo.jpg')] bg-repeat animate-diagonal grayscale opacity-[0.08] mix-blend-lighten" style="background-size: 300px 300px;"></div>
     </div>
 
-    <!-- Background Audio -->
-    <audio id="bg-music" loop>
-        <source src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/Cartoon%20Kicks.mp3" type="audio/mpeg">
-    </audio>
-
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
         <!-- Slime Dripping Background Area -->
         <div class="absolute inset-0 top-0 left-0 w-full pointer-events-none -z-10 flex flex-col drop-shadow-[0_10px_15px_rgba(204,255,0,0.15)]">
-            <div class="w-full bg-neon h-[70px] md:h-[80px]"></div>
-            <!-- SVG Diperpanjang 70% ke bawah (Height diubah dari 150 ke 250) -->
-            <svg viewBox="0 0 1000 250" preserveAspectRatio="none" class="w-full h-32 md:h-48 text-neon fill-current -mt-1">
-                <path class="animate-slime-slow origin-top opacity-50" d="M0,0 L1000,0 L1000,50 C950,180 900,10 850,80 C800,150 750,30 700,100 C650,170 600,10 550,60 C500,110 450,220 400,80 C350,-50 300,130 250,200 C200,270 150,50 100,110 C50,180 25,30 0,60 Z"/>
-                <path class="animate-slime origin-top" d="M0,0 L1000,0 L1000,10 C980,50 960,130 940,50 C920,-30 900,10 880,80 C860,150 840,60 820,30 C800,0 780,100 760,180 C740,260 720,30 700,30 C680,30 660,150 640,100 C620,50 600,0 580,30 C560,60 540,230 520,150 C500,60 480,30 460,60 C440,100 420,170 400,100 C380,30 360,10 340,50 C320,80 300,210 280,110 C260,10 240,30 220,80 C200,130 180,50 160,30 C140,10 120,100 100,170 C80,240 60,50 40,30 C20,10 10,60 0,30 Z" />
+            <!-- Blok Solid Panel yang dipertebal (Kini tingginya 120px untuk desktop, 100px untuk mobile) -->
+            <div class="w-full bg-neon h-[100px] md:h-[120px]"></div>
+            
+            <!-- SVG Lendir diletakkan tepat di bawah blok solid -->
+            <svg viewBox="0 0 1000 450" preserveAspectRatio="none" class="w-full h-48 md:h-[250px] text-neon fill-current -mt-1">
+                <path class="animate-slime-slow origin-top opacity-50" d="M0,0 L1000,0 L1000,80 C950,280 900,20 850,120 C800,250 750,50 700,160 C650,280 600,20 550,100 C500,180 450,350 400,130 C350,-50 300,220 250,320 C200,420 150,80 100,180 C50,280 25,50 0,100 Z"/>
+                <path class="animate-slime origin-top" d="M0,0 L1000,0 L1000,20 C980,80 960,220 940,80 C920,-30 900,20 880,130 C860,250 840,100 820,50 C800,0 780,160 760,280 C740,400 720,50 700,50 C680,50 660,250 640,160 C620,80 600,0 580,50 C560,100 540,380 520,250 C500,100 480,50 460,100 C440,160 420,280 400,160 C380,50 360,20 340,80 C320,130 300,350 280,180 C260,20 240,50 220,130 C200,220 180,80 160,50 C140,20 120,160 100,280 C80,400 60,80 40,50 C20,20 10,100 0,50 Z" />
             </svg>
         </div>
 
-        <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-6 md:px-12 relative z-10">
+        <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-6 md:px-12 relative z-10 h-[100px] md:h-[120px]">
             <!-- Logo (Now changed to black using CSS filter brightness-0) -->
-            <a href="#home" class="flex items-center gap-2">
-                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-8 md:h-10 brightness-0">
+            <a href="#" class="flex items-center gap-2">
+                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-10 md:h-12 brightness-0">
             </a>
 
             <!-- Desktop Menu (Now solid black) -->
@@ -156,24 +160,10 @@
                 <a href="#roadmap" class="hover:opacity-50 transition-opacity">ROADMAP</a>
                 <a href="#merch" class="hover:opacity-50 transition-opacity">MERCH</a>
                 <a href="#wl" class="hover:opacity-50 transition-opacity">WL APP</a>
-                
-                <!-- Music Toggle Button (Desktop) -->
-                <button id="music-toggle-desk" class="text-black hover:opacity-50 transition-opacity focus:outline-none ml-4" title="Toggle Music">
-                    <svg id="music-icon-desk" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </button>
             </div>
 
             <!-- Mobile Navbar Elements -->
             <div class="flex items-center gap-4 md:hidden">
-                <!-- Music Toggle Button (Mobile) -->
-                <button id="music-toggle-mob" class="text-black hover:opacity-50 transition-opacity focus:outline-none" title="Toggle Music">
-                    <svg id="music-icon-mob" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                </button>
-                
                 <!-- Mobile Menu Button (Now Black) -->
                 <button class="text-black focus:outline-none hover:opacity-50 transition-opacity" id="mobile-menu-btn">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -182,7 +172,7 @@
         </div>
         
         <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-[70px] left-0 w-full bg-neon/95 backdrop-blur-md border-b-4 border-black p-6 flex flex-col space-y-4 shadow-xl z-0">
+        <div id="mobile-menu" class="hidden md:hidden absolute top-[100px] left-0 w-full bg-neon/95 backdrop-blur-md border-b-4 border-black p-6 flex flex-col space-y-4 shadow-xl z-0">
              <a href="#home" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">HOME</a>
              <a href="#collection" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">COLLECTION</a>
              <a href="#roadmap" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">ROADMAP</a>
@@ -192,9 +182,12 @@
     </nav>
 
     <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent">
+        <!-- Abstract Parallax Background Elements -->
         <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
+            <!-- Grid overlay -->
             <div class="absolute inset-0" style="background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px); background-size: 50px 50px; opacity: 0.3;"></div>
             
+            <!-- Floating Elements (Mouse Parallax) -->
             <div class="absolute top-1/4 left-1/4 w-64 h-64 border border-neon/30 rounded-full mouse-parallax" data-speed="-2"></div>
             <div class="absolute bottom-1/4 right-1/4 w-96 h-96 border border-white/5 rotate-45 mouse-parallax" data-speed="3"></div>
             <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-neon/5 blur-3xl rounded-full mouse-parallax" data-speed="1"></div>
@@ -203,6 +196,7 @@
             </div>
         </div>
 
+        <!-- Main Hero Content (Scroll Parallax) -->
         <div class="relative z-10 text-center w-full max-w-6xl px-4 flex flex-col items-center pt-20">
             <h2 class="text-neon tracking-widest text-sm md:text-base font-bold mb-4 uppercase scroll-parallax" data-speed="0.2">
                 [ HAND-DRAWN collection ]
@@ -212,6 +206,7 @@
                 <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase relative z-10">
                     GREEN<span class="text-neon">BOYZ</span>
                 </h1>
+                <!-- Glitch/Echo effect text behind -->
                 <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
                     GREENBOYZ
                 </h1>
@@ -220,19 +215,55 @@
             <p class="mt-8 text-gray-400 max-w-lg mx-auto text-sm md:text-base scroll-parallax" data-speed="0.6">
                 Hand-drawn Digital identity. A collection of 1111 high-end fashion avatars redefining streetwear on the blockchain.
             </p>
+
+            <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center scroll-parallax" data-speed="0.8">
+                <a href="#wl" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
+                    Join Allowlist
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </a>
+                <a href="#collection" class="bg-transparent border border-gray-600 text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
+                    Explore Drops
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce opacity-50">
+            <span class="text-xs tracking-widest uppercase mb-2">Scroll</span>
+            <div class="w-px h-12 bg-gradient-to-b from-neon to-transparent"></div>
         </div>
     </header>
 
     <div class="bg-neon text-black py-3 overflow-hidden flex flex-nowrap border-y border-white/20 relative z-20">
+        <!-- First group -->
         <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4">
-            <span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
         </div>
+        <!-- Second group (duplicate for seamless loop) -->
         <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4" aria-hidden="true">
-            <span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span>
         </div>
     </div>
 
-    <section id="collection" class="py-24 px-6 md:px-12 bg-transparent relative z-10">
+    <section id="collection" class="py-24 px-6 md:px-12 bg-transparent relative">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                 <div>
@@ -244,14 +275,19 @@
                 </p>
             </div>
 
+            <!-- Single Frame for GIF -->
             <div class="flex justify-center w-full">
                 <div class="group relative border-neon-glow bg-graydark p-4 flex flex-col h-[400px] w-full max-w-sm">
                     <div class="w-full h-full bg-dark flex items-center justify-center overflow-hidden relative border border-white/5">
+                        <!-- Placeholder for GIF File -->
                         <div class="absolute inset-0 bg-gradient-to-br from-gray-900 to-black"></div>
+                        
                         <div class="text-center z-10 flex flex-col items-center justify-center text-gray-500 group-hover:text-neon transition-colors duration-300">
                             <svg class="w-12 h-12 mb-4 animate-pulse-slow mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="1" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span class="font-mono text-sm tracking-widest">[ .GIF ASSET HERE ]</span>
                         </div>
+                        
+                        <!-- Tech decorations -->
                         <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-neon/50"></div>
                         <div class="absolute top-2 right-2 w-4 h-4 border-t border-r border-neon/50"></div>
                         <div class="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-neon/50"></div>
@@ -263,11 +299,18 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="mt-16 text-center">
+                 <a href="#" class="inline-block border-b border-neon text-neon uppercase font-bold tracking-widest hover:text-white hover:border-white transition-colors pb-1">View Full Gallery</a>
+            </div>
         </div>
     </section>
 
-    <section id="roadmap" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden z-10">
+    <section id="roadmap" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden">
+        <!-- Blueprint Grid Background -->
         <div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(204,255,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(204,255,0,0.5) 1px, transparent 1px); background-size: 50px 50px;"></div>
+
+        <!-- Parallax Background Text -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-5">
             <h2 class="text-[15vw] font-bold uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
         </div>
@@ -279,40 +322,58 @@
             </div>
 
             <div class="relative w-full py-10">
+                <!-- SVG Skate Route Path (Desktop Only) -->
                 <div class="absolute inset-0 hidden md:block w-full h-full pointer-events-none">
                     <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Blueprint dimension lines -->
                         <path d="M 0 100 L 1000 100" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
                         <path d="M 0 350 L 1000 350" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
                         <path d="M 0 600 L 1000 600" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
+                        
+                        <!-- Main Skate Route Line (S-Curve Ramp) -->
                         <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
+                        <!-- Outline glow for neon effect -->
                         <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
+                        
+                        <!-- Route nodes -->
                         <circle cx="150" cy="50" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                         <circle cx="850" cy="350" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                         <circle cx="150" cy="650" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                     </svg>
                 </div>
 
+                <!-- Phase Items placed along the route (Mobile linear, Desktop mapped to SVG) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0 relative">
+                    
+                    <!-- Phase 1 -->
                     <div class="relative md:absolute md:top-[0px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">01</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Drop In</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Establishment</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Community building, core team dox, and initial sneak peeks of the 1111 collection. WL application opens.</p>
+                        <p class="text-gray-400 text-xs md:text-sm">Community building, core team dox, and initial sneak peeks of the 1111 collection. WL application opens for early supporters.</p>
+                        <!-- Tech spec decorations -->
+                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">RAMP_A // X150:Y50</div>
                     </div>
 
+                    <!-- Phase 2 -->
                     <div class="relative md:absolute md:top-[300px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
                         <div class="absolute -top-4 -right-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">02</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">The Grind</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Mint</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Minting phase for WL and Public. Reveal happens 48 hours post-mint. Secondary market listings & integration.</p>
+                        <p class="text-gray-400 text-xs md:text-sm">Minting phase for WL and Public. Reveal happens 48 hours post-mint. Secondary market listings & rarity sniper integration.</p>
+                        <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">BOWL_B // X850:Y350</div>
                     </div>
 
+                    <!-- Phase 3 -->
                     <div class="relative md:absolute md:top-[600px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">03</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Air Time</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Phygital Merch</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Holders claim physical streetwear items matching their NFT. NFC tags embedded for blockchain verification.</p>
+                        <p class="text-gray-400 text-xs md:text-sm">Holders claim physical streetwear items matching their NFT. NFC tags embedded for blockchain verification on the streets.</p>
+                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">PIPE_C // X150:Y650</div>
                     </div>
+
+                    <!-- Layout Spacer for desktop to match absolute heights -->
                     <div class="hidden md:block w-full h-[750px] pointer-events-none"></div>
                 </div>
             </div>
@@ -321,31 +382,49 @@
 
     <section id="merch" class="py-24 px-6 md:px-12 bg-transparent relative z-10">
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+            <!-- Image Side -->
             <div class="w-full lg:w-1/2 relative group">
+                <!-- Decorative background elements -->
                 <div class="absolute inset-0 bg-neon translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500"></div>
+                
                 <div class="bg-graydark aspect-square w-full border border-white/10 flex items-center justify-center relative overflow-hidden">
                     <div class="text-center z-10">
                         <div class="w-32 h-48 border-2 border-neon/50 mx-auto mb-4 relative">
+                            <!-- Hoodie Placeholder Graphic -->
                             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-8 border-b-2 border-neon/50 rounded-b-full"></div>
                             <div class="absolute top-8 left-1/4 w-1/2 h-full border-t-2 border-neon/50"></div>
                         </div>
                         <h4 class="uppercase tracking-widest font-bold text-xl text-white">Genesis Hoodie</h4>
                         <p class="text-neon font-mono text-sm mt-2">NFC ENABLED // NFC-001</p>
                     </div>
+                    <!-- Glitch lines -->
+                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSJ0cmFuc3BhcmVudCI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDRaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-30"></div>
                 </div>
             </div>
 
+            <!-- Text Side -->
             <div class="w-full lg:w-1/2">
                 <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// HOLDER EXCLUSIVE</h3>
                 <h2 class="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-6">Wear Your <br><span class="text-outline">Digital Asset</span></h2>
                 <p class="text-gray-400 mb-8 text-lg">
-                    GREENBOYZ is a lifestyle brand. Every NFT in the genesis collection acts as a mint pass for our premium, NFC-enabled physical streetwear drops. Scan the tag on your hoodie to prove ownership on-chain.
+                    We are not just a JPEG. GREENBOYZ is a lifestyle brand. Every NFT in the genesis collection acts as a mint pass for our premium, NFC-enabled physical streetwear drops. Scan the tag on your hoodie to prove ownership on-chain.
                 </p>
+                
                 <ul class="space-y-4 mb-10 text-sm font-mono text-gray-300">
-                    <li class="flex items-center gap-3"><span class="text-neon">✓</span> Heavyweight 450gsm French Terry</li>
-                    <li class="flex items-center gap-3"><span class="text-neon">✓</span> Embedded Secure NFC Chip</li>
-                    <li class="flex items-center gap-3"><span class="text-neon">✓</span> Exclusive to NFT Holders Only</li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-neon">✓</span> Heavyweight 450gsm French Terry
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-neon">✓</span> Embedded Secure NFC Chip
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <span class="text-neon">✓</span> Exclusive to NFT Holders Only
+                    </li>
                 </ul>
+
+                <button class="bg-transparent border border-white text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
+                    View Lookbook
+                </button>
             </div>
         </div>
     </section>
@@ -358,8 +437,12 @@
             <form class="max-w-md mx-auto space-y-4" onsubmit="event.preventDefault(); alert('Form submitted! (Demo only)');">
                 <input type="email" placeholder="ENTER EMAIL ADDRESS" class="w-full bg-black text-white px-6 py-4 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-white border border-black placeholder:text-gray-600" required>
                 <div class="grid grid-cols-2 gap-4">
-                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">Discord</button>
-                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">Twitter</button>
+                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">
+                        Discord
+                    </button>
+                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">
+                        Twitter
+                    </button>
                 </div>
                 <button type="submit" class="w-full bg-transparent border-2 border-black text-black px-6 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-colors mt-4">
                     Submit Application
@@ -370,13 +453,16 @@
 
     <footer class="bg-black pt-24 pb-8 px-6 md:px-12 border-t border-white/10 relative z-10">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-            <a href="#home" class="flex items-center gap-2">
+            <a href="#" class="flex items-center gap-2">
+                <!-- Logo footer dibiarkan terang/putih agar terlihat di background hitam pekat -->
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-6 md:h-8">
             </a>
+            
             <div class="flex gap-6 font-mono text-sm text-gray-500">
                 <a href="#" class="hover:text-neon transition-colors">Opensea</a>
                 <a href="#" class="hover:text-neon transition-colors">Twitter</a>
                 <a href="#" class="hover:text-neon transition-colors">Discord</a>
+                <a href="#" class="hover:text-neon transition-colors">Etherscan</a>
             </div>
         </div>
         <div class="max-w-7xl mx-auto mt-8 text-center md:text-left text-gray-700 text-xs font-mono">
@@ -385,38 +471,6 @@
     </footer>
 
     <script>
-        // --- AUDIO CONTROLLER ---
-        const bgMusic = document.getElementById('bg-music');
-        const btnToggleDesk = document.getElementById('music-toggle-desk');
-        const iconDesk = document.getElementById('music-icon-desk');
-        const btnToggleMob = document.getElementById('music-toggle-mob');
-        const iconMob = document.getElementById('music-icon-mob');
-        
-        let isMusicPlaying = false;
-
-        const iconVolOn = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
-        const iconVolOff = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />';
-
-        bgMusic.volume = 0.5;
-
-        function toggleMusic() {
-            if (isMusicPlaying) {
-                bgMusic.pause();
-                iconDesk.innerHTML = iconVolOff;
-                iconMob.innerHTML = iconVolOff;
-                isMusicPlaying = false;
-            } else {
-                bgMusic.play().catch(e => console.log("Audio play prevented", e));
-                iconDesk.innerHTML = iconVolOn;
-                iconMob.innerHTML = iconVolOn;
-                isMusicPlaying = true;
-            }
-        }
-
-        btnToggleDesk.addEventListener('click', toggleMusic);
-        btnToggleMob.addEventListener('click', toggleMusic);
-
-
         // --- MENU INTERACTION ---
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -426,6 +480,7 @@
                 mobileMenu.classList.toggle('hidden');
             });
 
+            // Close mobile menu on link click
             mobileMenu.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     mobileMenu.classList.add('hidden');
@@ -433,16 +488,18 @@
             });
         }
 
-        // --- PARALLAX EFFECTS ---
-        document.addEventListener("mousemove", (e) => {
+        // --- MOUSE PARALLAX EFFECT (HERO) ---
+        document.addEventListener("mousemove", parallax);
+        function parallax(e) {
             document.querySelectorAll(".mouse-parallax").forEach(function(move){
                 var moving_value = move.getAttribute("data-speed");
                 var x = (e.clientX - window.innerWidth / 2) * moving_value / 100;
                 var y = (e.clientY - window.innerHeight / 2) * moving_value / 100;
                 move.style.transform = "translateX(" + x + "px) translateY(" + y + "px)";
             });
-        });
+        }
 
+        // --- SCROLL PARALLAX EFFECT ---
         window.addEventListener('scroll', () => {
             let scroll = window.scrollY;
             document.querySelectorAll('.scroll-parallax').forEach(el => {
@@ -452,14 +509,14 @@
         });
 
         // --- LOADING & SPRAY PAGE LOGIC ---
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden'; // Lock scroll initially
 
         const loader = document.getElementById('loader');
         const loadingText = document.getElementById('loading-text');
         const btnLetsSkate = document.getElementById('btn-lets-skate');
         const sprayPage = document.getElementById('spray-page');
         const canvas = document.getElementById('spray-canvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas ? canvas.getContext('2d') : null;
         
         let isDrawing = false;
         let scratchCompleted = false;
@@ -475,11 +532,6 @@
         // Aksi klik LET'S SKATE
         if(btnLetsSkate) {
             btnLetsSkate.addEventListener('click', () => {
-                // Mainkan musik secara otomatis saat user klik tombol pertama kali
-                if (!isMusicPlaying) {
-                    toggleMusic();
-                }
-
                 loader.classList.replace('opacity-100', 'opacity-0');
                 setTimeout(() => {
                     loader.style.display = 'none';
@@ -492,8 +544,10 @@
 
         // Setup Canvas Spray
         function initCanvas() {
+            if(!canvas || !ctx) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
+            // Cat layar menjadi hitam full
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -502,20 +556,24 @@
             if (!scratchCompleted && sprayPage && sprayPage.style.display !== 'none') initCanvas();
         });
 
+        // Posisi kursor / sentuhan
         function getMousePos(evt) {
+            if(!canvas) return {x:0, y:0};
             const rect = canvas.getBoundingClientRect();
             const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
             const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
+        // Fungsi mencoret / Spray
         function spray(evt) {
-            if (!isDrawing || scratchCompleted) return;
+            if (!isDrawing || scratchCompleted || !ctx) return;
             evt.preventDefault();
             
             const pos = getMousePos(evt);
             
             ctx.globalCompositeOperation = 'destination-out';
+            
             const radGrad = ctx.createRadialGradient(pos.x, pos.y, 10, pos.x, pos.y, 60);
             radGrad.addColorStop(0, 'rgba(0,0,0,1)');
             radGrad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -526,33 +584,39 @@
             ctx.fill();
         }
 
+        // Custom Cursor & Event listeners
         const customSprayCursor = document.getElementById('custom-spray-cursor');
 
-        canvas.addEventListener('mousedown', (e) => { isDrawing = true; spray(e); });
-        canvas.addEventListener('mousemove', (e) => {
-            if(!scratchCompleted && customSprayCursor) {
-                customSprayCursor.style.opacity = '1';
-                customSprayCursor.style.left = e.clientX + 'px';
-                customSprayCursor.style.top = e.clientY + 'px';
-            }
-            spray(e);
-        });
-        canvas.addEventListener('mouseup', () => { isDrawing = false; checkReveal(); });
-        canvas.addEventListener('mouseleave', () => { 
-            isDrawing = false;
-            if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
-        });
+        if(canvas) {
+            // Mouse Events
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; spray(e); });
+            canvas.addEventListener('mousemove', (e) => {
+                if(!scratchCompleted && customSprayCursor) {
+                    customSprayCursor.style.opacity = '1';
+                    customSprayCursor.style.left = e.clientX + 'px';
+                    customSprayCursor.style.top = e.clientY + 'px';
+                }
+                spray(e);
+            });
+            canvas.addEventListener('mouseup', () => { isDrawing = false; checkReveal(); });
+            canvas.addEventListener('mouseleave', () => { 
+                isDrawing = false;
+                if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
+            });
 
-        canvas.addEventListener('touchstart', (e) => { 
-            if(customSprayCursor) customSprayCursor.style.opacity = '0';
-            isDrawing = true; 
-            spray(e); 
-        }, {passive: false});
-        canvas.addEventListener('touchmove', spray, {passive: false});
-        canvas.addEventListener('touchend', () => { isDrawing = false; checkReveal(); });
+            // Touch Events (HP)
+            canvas.addEventListener('touchstart', (e) => { 
+                if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
+                isDrawing = true; 
+                spray(e); 
+            }, {passive: false});
+            canvas.addEventListener('touchmove', spray, {passive: false});
+            canvas.addEventListener('touchend', () => { isDrawing = false; checkReveal(); });
+        }
 
+        // Cek progres gosokan
         function checkReveal() {
-            if(scratchCompleted) return;
+            if(scratchCompleted || !ctx) return;
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const pixels = imageData.data;
             let transparent = 0;
@@ -564,26 +628,31 @@
             const total = pixels.length / 128;
             const percentage = (transparent / total) * 100;
             
+            // 25% area terhapus = selesai
             if (percentage > 25) {
                 completeSpray();
             }
         }
 
+        // Buka web utama
         function completeSpray() {
             scratchCompleted = true;
-            document.getElementById('spray-instruction').style.opacity = '0';
+            const instruction = document.getElementById('spray-instruction');
+            if(instruction) instruction.style.opacity = '0';
             if(customSprayCursor) customSprayCursor.style.opacity = '0';
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             setTimeout(() => {
-                sprayPage.classList.remove('opacity-100');
-                sprayPage.classList.add('opacity-0');
-                
-                setTimeout(() => {
-                    sprayPage.style.display = 'none';
-                    document.body.style.overflow = ''; 
-                }, 1000);
+                if(sprayPage) {
+                    sprayPage.classList.remove('opacity-100');
+                    sprayPage.classList.add('opacity-0');
+                    
+                    setTimeout(() => {
+                        sprayPage.style.display = 'none';
+                        document.body.style.overflow = ''; // Unlock scroll
+                    }, 1000);
+                }
             }, 1000);
         }
     </script>
