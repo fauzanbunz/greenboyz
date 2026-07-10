@@ -19,6 +19,7 @@
                     },
                     fontFamily: {
                         sans: ['Space Grotesk', 'sans-serif'],
+                        aerosoldier: ['Aerosoldier', 'sans-serif'],
                     },
                     animation: {
                         'marquee': 'marquee 25s linear infinite',
@@ -46,6 +47,15 @@
         }
     </script>
     <style>
+        /* IMPORT CUSTOM FONT */
+        @font-face {
+            font-family: 'Aerosoldier';
+            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/AerosoldierDrip_PERSONAL_USE_ONLY.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
         body {
             background-color: #050505;
             color: #f3f4f6;
@@ -90,11 +100,6 @@
         .marquee-container::-webkit-scrollbar {
             display: none;
         }
-
-        /* Custom Spray Cursor */
-        .cursor-spray {
-            cursor: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg') 12 12, crosshair;
-        }
     </style>
 </head>
 <body class="antialiased selection:bg-neon selection:text-black font-sans relative">
@@ -107,19 +112,24 @@
         </div>
         <div id="loading-text" class="mt-10 font-mono font-bold text-black tracking-widest text-lg animate-pulse uppercase">Loading Sector 7G...</div>
         
-        <!-- Tombol LET'S SKATE (muncul setelah 5 detik) -->
+        <!-- Tombol LET'S SKATE (muncul otomatis setelah 5 detik di JS) -->
         <button id="btn-lets-skate" class="hidden mt-8 px-8 py-4 border-4 border-black bg-transparent text-black font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-all animate-pulse text-xl">
             Let's Skate!
         </button>
     </div>
 
-    <!-- Spray Page (Muncu setelah klik Let's Skate) -->
+    <!-- Audio Element untuk Spray (hanya sfx) -->
+    <audio id="spray-sfx" loop preload="auto">
+        <source src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/soundreality-spray-178360%20(mp3cut.net).mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Spray Page (Muncul setelah klik Let's Skate) -->
     <div id="spray-page" class="fixed inset-0 z-[90] bg-black hidden flex-col items-center justify-center transition-opacity duration-1000 opacity-100 cursor-none">
         <!-- Logo Text Tersembunyi di belakang canvas -->
         <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="absolute w-4/5 md:w-1/2 max-w-2xl opacity-100 pointer-events-none drop-shadow-[0_0_20px_rgba(204,255,0,0.4)]">
         
         <div id="spray-instruction" class="absolute top-24 text-neon font-mono text-sm tracking-widest animate-pulse pointer-events-none text-center z-10">
-            [ SPRAY THE WALL ]<br><span class="text-xs text-gray-500 mt-2 block">Use cursor/finger to scratch the black screen</span>
+            [ SPRAY THE WALL ]<br><span class="text-xs text-gray-500 mt-2 block">Use cursor/finger to scratch the black screen (20% to reveal)</span>
         </div>
 
         <!-- Canvas untuk efek Spray/Scratch -->
@@ -127,9 +137,6 @@
 
         <!-- Custom JS Cursor for Spray -->
         <img id="custom-spray-cursor" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg" class="fixed pointer-events-none z-[100] w-12 h-12 -translate-x-[50%] -translate-y-[50%] opacity-0 transition-opacity duration-150 drop-shadow-[0_0_8px_rgba(204,255,0,0.6)]">
-        
-        <!-- Audio Efek Spray -->
-        <audio id="spray-sound" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/soundreality-spray-178360%20(mp3cut.net).mp3" preload="auto" loop></audio>
     </div>
 
     <!-- Global Continuous Diagonal Pattern Background -->
@@ -138,19 +145,18 @@
     </div>
 
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
-        <!-- Slime Dripping Background Area -->
+        <!-- Header Panel Solid Area & Slime Dripping (Dipertebal/Ditarik kebawah) -->
         <div class="absolute inset-0 top-0 left-0 w-full pointer-events-none -z-10 flex flex-col drop-shadow-[0_10px_15px_rgba(204,255,0,0.15)]">
-            <!-- Blok Solid Panel yang ditarik lebih ke bawah (150px untuk mobile, 180px untuk desktop) -->
+            <!-- Blok Solid Lebih Tebal -->
             <div class="w-full bg-neon h-[150px] md:h-[180px]"></div>
-            
-            <!-- SVG Lendir diletakkan tepat di bawah blok solid -->
-            <svg viewBox="0 0 1000 450" preserveAspectRatio="none" class="w-full h-48 md:h-[250px] text-neon fill-current -mt-1">
-                <path class="animate-slime-slow origin-top opacity-50" d="M0,0 L1000,0 L1000,80 C950,280 900,20 850,120 C800,250 750,50 700,160 C650,280 600,20 550,100 C500,180 450,350 400,130 C350,-50 300,220 250,320 C200,420 150,80 100,180 C50,280 25,50 0,100 Z"/>
-                <path class="animate-slime origin-top" d="M0,0 L1000,0 L1000,20 C980,80 960,220 940,80 C920,-30 900,20 880,130 C860,250 840,100 820,50 C800,0 780,160 760,280 C740,400 720,50 700,50 C680,50 660,250 640,160 C620,80 600,0 580,50 C560,100 540,380 520,250 C500,100 480,50 460,100 C440,160 420,280 400,160 C380,50 360,20 340,80 C320,130 300,350 280,180 C260,20 240,50 220,130 C200,220 180,80 160,50 C140,20 120,160 100,280 C80,400 60,80 40,50 C20,20 10,100 0,50 Z" />
+            <!-- Slime Tetesan di Bawah Blok -->
+            <svg viewBox="0 0 1000 150" preserveAspectRatio="none" class="w-full h-24 md:h-32 text-neon fill-current -mt-1">
+                <path class="animate-slime-slow origin-top opacity-50" d="M0,0 L1000,0 L1000,30 C950,110 900,10 850,50 C800,90 750,20 700,60 C650,100 600,10 550,40 C500,70 450,130 400,50 C350,-30 300,80 250,120 C200,160 150,30 100,70 C50,110 25,20 0,40 Z"/>
+                <path class="animate-slime origin-top" d="M0,0 L1000,0 L1000,10 C980,30 960,80 940,30 C920,-20 900,10 880,50 C860,90 840,40 820,20 C800,0 780,60 760,110 C740,160 720,20 700,20 C680,20 660,90 640,60 C620,30 600,0 580,20 C560,40 540,140 520,90 C500,40 480,20 460,40 C440,60 420,100 400,60 C380,20 360,10 340,30 C320,50 300,130 280,70 C260,10 240,20 220,50 C200,80 180,30 160,20 C140,10 120,60 100,100 C80,140 60,30 40,20 C20,10 10,40 0,20 Z" />
             </svg>
         </div>
 
-        <!-- Posisi logo dan menu ditarik ke atas menggunakan pt-4 dan md:pt-6 -->
+        <!-- Posisi logo dan menu ditarik ke atas menggunakan items-start dan padding top (pt-4 md:pt-6) -->
         <div class="max-w-7xl mx-auto flex justify-between items-start pt-4 md:pt-6 px-6 md:px-12 relative z-10 h-[150px] md:h-[180px]">
             <!-- Logo (Now changed to black using CSS filter brightness-0) -->
             <a href="#" class="flex items-center gap-2">
@@ -158,7 +164,7 @@
             </a>
 
             <!-- Desktop Menu (Now solid black) -->
-            <div class="hidden md:flex space-x-8 items-center text-sm font-extrabold tracking-wide text-black">
+            <div class="hidden md:flex space-x-8 items-center text-sm font-extrabold tracking-wide text-black mt-2">
                 <a href="#home" class="hover:opacity-50 transition-opacity">HOME</a>
                 <a href="#collection" class="hover:opacity-50 transition-opacity">COLLECTION</a>
                 <a href="#roadmap" class="hover:opacity-50 transition-opacity">ROADMAP</a>
@@ -167,10 +173,10 @@
             </div>
 
             <!-- Mobile Navbar Elements -->
-            <div class="flex items-center gap-4 md:hidden">
+            <div class="flex items-center gap-4 md:hidden mt-2">
                 <!-- Mobile Menu Button (Now Black) -->
                 <button class="text-black focus:outline-none hover:opacity-50 transition-opacity" id="mobile-menu-btn">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
         </div>
@@ -185,7 +191,7 @@
         </div>
     </nav>
 
-    <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent">
+    <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent pt-32">
         <!-- Abstract Parallax Background Elements -->
         <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
             <!-- Grid overlay -->
@@ -201,17 +207,18 @@
         </div>
 
         <!-- Main Hero Content (Scroll Parallax) -->
-        <div class="relative z-10 text-center w-full max-w-6xl px-4 flex flex-col items-center pt-20">
+        <div class="relative z-10 text-center w-full max-w-6xl px-4 flex flex-col items-center">
             <h2 class="text-neon tracking-widest text-sm md:text-base font-bold mb-4 uppercase scroll-parallax" data-speed="0.2">
                 [ HAND-DRAWN collection ]
             </h2>
             
             <div class="relative scroll-parallax" data-speed="0.4">
-                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase relative z-10">
+                <!-- CUSTOM FONT APPLIED HERE -->
+                <h1 class="text-6xl md:text-[8rem] lg:text-[11rem] font-aerosoldier font-normal leading-none uppercase relative z-10">
                     GREEN<span class="text-neon">BOYZ</span>
                 </h1>
                 <!-- Glitch/Echo effect text behind -->
-                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
+                <h1 class="text-6xl md:text-[8rem] lg:text-[11rem] font-aerosoldier font-normal leading-none uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
                     GREENBOYZ
                 </h1>
             </div>
@@ -272,7 +279,8 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                 <div>
                     <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// GENESIS DROP</h3>
-                    <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">The <span class="text-outline">Collection</span></h2>
+                    <!-- CUSTOM FONT APPLIED HERE -->
+                    <h2 class="text-4xl md:text-6xl font-aerosoldier font-normal uppercase">The <span class="text-outline">Collection</span></h2>
                 </div>
                 <p class="text-gray-400 max-w-md text-sm">
                     Each avatar is procedurally generated from over 300 hand-drawn streetwear traits. Hoodies, sneakers, tech-wear, and artifacts.
@@ -311,51 +319,56 @@
     </section>
 
     <section id="roadmap" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden">
-        <!-- Blueprint Grid Background -->
-        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(204,255,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(204,255,0,0.5) 1px, transparent 1px); background-size: 50px 50px;"></div>
+        
+        <!-- NEW Custom Image Blueprint Background (Isolasi line art & recolor ke Neon Green) -->
+        <div class="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+            <div class="relative w-full h-full bg-black">
+                <!-- invert(1) mengubah BG putih jadi hitam dan garis hitam jadi putih. grayscale(1) membuang sisa warna. -->
+                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2011%20Jul%202026%2C%2002.00.37.png" class="absolute inset-0 w-full h-full object-cover" style="filter: invert(1) grayscale(1) contrast(150%);">
+                <!-- Overlay ini mewarnai garis yang sudah jadi putih tadi menjadi warna neon (karena efek multiply) -->
+                <div class="absolute inset-0 bg-neon mix-blend-multiply"></div>
+            </div>
+        </div>
 
         <!-- Parallax Background Text -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-5">
-            <h2 class="text-[15vw] font-bold uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
+            <!-- CUSTOM FONT APPLIED HERE -->
+            <h2 class="text-[12vw] md:text-[15vw] font-aerosoldier font-normal uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
         </div>
 
         <div class="max-w-5xl mx-auto relative z-10">
             <div class="text-center mb-16">
                 <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// THE ROUTE</h3>
-                <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">Skate <span class="text-outline">Blueprint</span></h2>
+                <!-- CUSTOM FONT APPLIED HERE -->
+                <h2 class="text-4xl md:text-6xl font-aerosoldier font-normal uppercase">Skate <span class="text-outline">Blueprint</span></h2>
             </div>
 
             <div class="relative w-full py-10">
                 <!-- SVG Skate Route Path (Desktop Only) -->
                 <div class="absolute inset-0 hidden md:block w-full h-full pointer-events-none">
                     <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Blueprint dimension lines -->
                         <path d="M 0 100 L 1000 100" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
                         <path d="M 0 350 L 1000 350" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
                         <path d="M 0 600 L 1000 600" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
                         
                         <!-- Main Skate Route Line (S-Curve Ramp) -->
                         <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
-                        <!-- Outline glow for neon effect -->
                         <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
                         
-                        <!-- Route nodes -->
                         <circle cx="150" cy="50" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                         <circle cx="850" cy="350" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                         <circle cx="150" cy="650" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                     </svg>
                 </div>
 
-                <!-- Phase Items placed along the route (Mobile linear, Desktop mapped to SVG) -->
+                <!-- Phase Items -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0 relative">
-                    
                     <!-- Phase 1 -->
                     <div class="relative md:absolute md:top-[0px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">01</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Drop In</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Establishment</h3>
                         <p class="text-gray-400 text-xs md:text-sm">Community building, core team dox, and initial sneak peeks of the 1111 collection. WL application opens for early supporters.</p>
-                        <!-- Tech spec decorations -->
                         <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">RAMP_A // X150:Y50</div>
                     </div>
 
@@ -377,7 +390,7 @@
                         <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">PIPE_C // X150:Y650</div>
                     </div>
 
-                    <!-- Layout Spacer for desktop to match absolute heights -->
+                    <!-- Layout Spacer -->
                     <div class="hidden md:block w-full h-[750px] pointer-events-none"></div>
                 </div>
             </div>
@@ -388,9 +401,7 @@
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
             <!-- Image Side -->
             <div class="w-full lg:w-1/2 relative group">
-                <!-- Decorative background elements -->
                 <div class="absolute inset-0 bg-neon translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500"></div>
-                
                 <div class="bg-graydark aspect-square w-full border border-white/10 flex items-center justify-center relative overflow-hidden">
                     <div class="text-center z-10">
                         <div class="w-32 h-48 border-2 border-neon/50 mx-auto mb-4 relative">
@@ -409,7 +420,8 @@
             <!-- Text Side -->
             <div class="w-full lg:w-1/2">
                 <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// HOLDER EXCLUSIVE</h3>
-                <h2 class="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-6">Wear Your <br><span class="text-outline">Digital Asset</span></h2>
+                <!-- CUSTOM FONT APPLIED HERE -->
+                <h2 class="text-4xl md:text-5xl font-aerosoldier font-normal uppercase mb-6">Wear Your <br><span class="text-outline">Digital Asset</span></h2>
                 <p class="text-gray-400 mb-8 text-lg">
                     We are not just a JPEG. GREENBOYZ is a lifestyle brand. Every NFT in the genesis collection acts as a mint pass for our premium, NFC-enabled physical streetwear drops. Scan the tag on your hoodie to prove ownership on-chain.
                 </p>
@@ -435,7 +447,8 @@
 
     <section id="wl" class="py-24 px-6 md:px-12 bg-neon text-black clip-path-slant relative -mb-10 pt-32 pb-40 z-20">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-5xl md:text-7xl font-bold uppercase tracking-tighter mb-6">Join <br>GREENBOYZ</h2>
+            <!-- CUSTOM FONT APPLIED HERE -->
+            <h2 class="text-5xl md:text-7xl font-aerosoldier font-normal uppercase mb-6">Join <br>GREENBOYZ</h2>
             <p class="font-medium max-w-xl mx-auto mb-10">Allowlist spots are limited and hand-picked. Connect your Twitter and Discord to apply for the Genesis Mint.</p>
             
             <form class="max-w-md mx-auto space-y-4" onsubmit="event.preventDefault(); alert('Form submitted! (Demo only)');">
@@ -458,7 +471,6 @@
     <footer class="bg-black pt-24 pb-8 px-6 md:px-12 border-t border-white/10 relative z-10">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <a href="#" class="flex items-center gap-2">
-                <!-- Logo footer dibiarkan terang/putih agar terlihat di background hitam pekat -->
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-6 md:h-8">
             </a>
             
@@ -484,7 +496,6 @@
                 mobileMenu.classList.toggle('hidden');
             });
 
-            // Close mobile menu on link click
             mobileMenu.querySelectorAll('a').forEach(link => {
                 link.addEventListener('click', () => {
                     mobileMenu.classList.add('hidden');
@@ -492,7 +503,7 @@
             });
         }
 
-        // --- MOUSE PARALLAX EFFECT (HERO) ---
+        // --- PARALLAX EFFECTS ---
         document.addEventListener("mousemove", parallax);
         function parallax(e) {
             document.querySelectorAll(".mouse-parallax").forEach(function(move){
@@ -503,7 +514,6 @@
             });
         }
 
-        // --- SCROLL PARALLAX EFFECT ---
         window.addEventListener('scroll', () => {
             let scroll = window.scrollY;
             document.querySelectorAll('.scroll-parallax').forEach(el => {
@@ -513,7 +523,7 @@
         });
 
         // --- LOADING & SPRAY PAGE LOGIC ---
-        document.body.style.overflow = 'hidden'; // Lock scroll initially
+        document.body.style.overflow = 'hidden';
 
         const loader = document.getElementById('loader');
         const loadingText = document.getElementById('loading-text');
@@ -521,12 +531,12 @@
         const sprayPage = document.getElementById('spray-page');
         const canvas = document.getElementById('spray-canvas');
         const ctx = canvas ? canvas.getContext('2d') : null;
-        const spraySound = document.getElementById('spray-sound'); // Deklarasi Audio
+        const spraySfx = document.getElementById('spray-sfx');
         
         let isDrawing = false;
         let scratchCompleted = false;
 
-        // PENTING: Timer berjalan langsung tanpa menunggu file audio/gambar berat selesai didownload.
+        // Tampilkan tombol Let's Skate! segera
         setTimeout(() => {
             if(loadingText && btnLetsSkate) {
                 loadingText.classList.add('hidden');
@@ -552,7 +562,6 @@
             if(!canvas || !ctx) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // Cat layar menjadi hitam full
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -561,16 +570,13 @@
             if (!scratchCompleted && sprayPage && sprayPage.style.display !== 'none') initCanvas();
         });
 
-        // Posisi kursor / sentuhan
         function getMousePos(evt) {
-            if(!canvas) return {x:0, y:0};
             const rect = canvas.getBoundingClientRect();
             const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
             const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        // Fungsi mencoret / Spray
         function spray(evt) {
             if (!isDrawing || scratchCompleted || !ctx) return;
             evt.preventDefault();
@@ -589,16 +595,23 @@
             ctx.fill();
         }
 
-        // Custom Cursor & Event listeners
         const customSprayCursor = document.getElementById('custom-spray-cursor');
 
+        // Play SFX saat klik
+        function startSpraySound() {
+            if(spraySfx && !scratchCompleted) {
+                spraySfx.currentTime = 0;
+                spraySfx.play().catch(e => console.log("Audio play prevented"));
+            }
+        }
+        
+        // Pause SFX saat dilepas
+        function stopSpraySound() {
+            if(spraySfx) spraySfx.pause();
+        }
+
         if(canvas) {
-            // Mouse Events
-            canvas.addEventListener('mousedown', (e) => { 
-                isDrawing = true; 
-                if(spraySound) spraySound.play().catch(err => console.log(err)); // Mainkan Suara
-                spray(e); 
-            });
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; startSpraySound(); spray(e); });
             canvas.addEventListener('mousemove', (e) => {
                 if(!scratchCompleted && customSprayCursor) {
                     customSprayCursor.style.opacity = '1';
@@ -607,35 +620,25 @@
                 }
                 spray(e);
             });
-            canvas.addEventListener('mouseup', () => { 
-                isDrawing = false; 
-                if(spraySound) spraySound.pause(); // Jeda Suara
-                checkReveal(); 
-            });
+            canvas.addEventListener('mouseup', () => { isDrawing = false; stopSpraySound(); checkReveal(); });
             canvas.addEventListener('mouseleave', () => { 
                 isDrawing = false;
-                if(spraySound) spraySound.pause(); // Jeda Suara
-                if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
+                stopSpraySound();
+                if(customSprayCursor) customSprayCursor.style.opacity = '0';
             });
 
-            // Touch Events (HP)
             canvas.addEventListener('touchstart', (e) => { 
-                if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
+                if(customSprayCursor) customSprayCursor.style.opacity = '0';
                 isDrawing = true; 
-                if(spraySound) spraySound.play().catch(err => console.log(err)); // Mainkan Suara
+                startSpraySound();
                 spray(e); 
             }, {passive: false});
             canvas.addEventListener('touchmove', spray, {passive: false});
-            canvas.addEventListener('touchend', () => { 
-                isDrawing = false; 
-                if(spraySound) spraySound.pause(); // Jeda Suara
-                checkReveal(); 
-            });
+            canvas.addEventListener('touchend', () => { isDrawing = false; stopSpraySound(); checkReveal(); });
         }
 
-        // Cek progres gosokan
         function checkReveal() {
-            if(scratchCompleted || !ctx) return;
+            if(scratchCompleted || !ctx || !canvas) return;
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const pixels = imageData.data;
             let transparent = 0;
@@ -647,22 +650,22 @@
             const total = pixels.length / 128;
             const percentage = (transparent / total) * 100;
             
-            // 80% area terhapus = selesai
+            // 20% area terhapus = selesai
             if (percentage > 20) {
                 completeSpray();
             }
         }
 
-        // Buka web utama
         function completeSpray() {
             scratchCompleted = true;
-            if(spraySound) spraySound.pause(); // Matikan suara total
+            stopSpraySound();
             
-            const instruction = document.getElementById('spray-instruction');
-            if(instruction) instruction.style.opacity = '0';
+            const instr = document.getElementById('spray-instruction');
+            if(instr) instr.style.opacity = '0';
+            
             if(customSprayCursor) customSprayCursor.style.opacity = '0';
 
-            if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if(ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             setTimeout(() => {
                 if(sprayPage) {
@@ -671,7 +674,7 @@
                     
                     setTimeout(() => {
                         sprayPage.style.display = 'none';
-                        document.body.style.overflow = ''; // Unlock scroll
+                        document.body.style.overflow = '';
                     }, 1000);
                 }
             }, 1000);
