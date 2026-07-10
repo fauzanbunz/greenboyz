@@ -127,6 +127,9 @@
 
         <!-- Custom JS Cursor for Spray -->
         <img id="custom-spray-cursor" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg" class="fixed pointer-events-none z-[100] w-12 h-12 -translate-x-[50%] -translate-y-[50%] opacity-0 transition-opacity duration-150 drop-shadow-[0_0_8px_rgba(204,255,0,0.6)]">
+        
+        <!-- Audio Efek Spray -->
+        <audio id="spray-sound" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/soundreality-spray-178360%20(mp3cut.net).mp3" preload="auto" loop></audio>
     </div>
 
     <!-- Global Continuous Diagonal Pattern Background -->
@@ -137,8 +140,8 @@
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
         <!-- Slime Dripping Background Area -->
         <div class="absolute inset-0 top-0 left-0 w-full pointer-events-none -z-10 flex flex-col drop-shadow-[0_10px_15px_rgba(204,255,0,0.15)]">
-            <!-- Blok Solid Panel yang dipertebal (Kini tingginya 120px untuk desktop, 100px untuk mobile) -->
-            <div class="w-full bg-neon h-[100px] md:h-[120px]"></div>
+            <!-- Blok Solid Panel yang ditarik lebih ke bawah (150px untuk mobile, 180px untuk desktop) -->
+            <div class="w-full bg-neon h-[150px] md:h-[180px]"></div>
             
             <!-- SVG Lendir diletakkan tepat di bawah blok solid -->
             <svg viewBox="0 0 1000 450" preserveAspectRatio="none" class="w-full h-48 md:h-[250px] text-neon fill-current -mt-1">
@@ -147,7 +150,7 @@
             </svg>
         </div>
 
-        <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-6 md:px-12 relative z-10 h-[100px] md:h-[120px]">
+        <div class="max-w-7xl mx-auto flex justify-between items-center py-4 px-6 md:px-12 relative z-10 h-[150px] md:h-[180px]">
             <!-- Logo (Now changed to black using CSS filter brightness-0) -->
             <a href="#" class="flex items-center gap-2">
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-10 md:h-12 brightness-0">
@@ -172,7 +175,7 @@
         </div>
         
         <!-- Mobile Menu Panel -->
-        <div id="mobile-menu" class="hidden md:hidden absolute top-[100px] left-0 w-full bg-neon/95 backdrop-blur-md border-b-4 border-black p-6 flex flex-col space-y-4 shadow-xl z-0">
+        <div id="mobile-menu" class="hidden md:hidden absolute top-[150px] left-0 w-full bg-neon/95 backdrop-blur-md border-b-4 border-black p-6 flex flex-col space-y-4 shadow-xl z-0">
              <a href="#home" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">HOME</a>
              <a href="#collection" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">COLLECTION</a>
              <a href="#roadmap" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">ROADMAP</a>
@@ -517,6 +520,7 @@
         const sprayPage = document.getElementById('spray-page');
         const canvas = document.getElementById('spray-canvas');
         const ctx = canvas ? canvas.getContext('2d') : null;
+        const spraySound = document.getElementById('spray-sound'); // Deklarasi Audio
         
         let isDrawing = false;
         let scratchCompleted = false;
@@ -589,7 +593,11 @@
 
         if(canvas) {
             // Mouse Events
-            canvas.addEventListener('mousedown', (e) => { isDrawing = true; spray(e); });
+            canvas.addEventListener('mousedown', (e) => { 
+                isDrawing = true; 
+                if(spraySound) spraySound.play().catch(err => console.log(err)); // Mainkan Suara
+                spray(e); 
+            });
             canvas.addEventListener('mousemove', (e) => {
                 if(!scratchCompleted && customSprayCursor) {
                     customSprayCursor.style.opacity = '1';
@@ -598,9 +606,14 @@
                 }
                 spray(e);
             });
-            canvas.addEventListener('mouseup', () => { isDrawing = false; checkReveal(); });
+            canvas.addEventListener('mouseup', () => { 
+                isDrawing = false; 
+                if(spraySound) spraySound.pause(); // Jeda Suara
+                checkReveal(); 
+            });
             canvas.addEventListener('mouseleave', () => { 
                 isDrawing = false;
+                if(spraySound) spraySound.pause(); // Jeda Suara
                 if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
             });
 
@@ -608,10 +621,15 @@
             canvas.addEventListener('touchstart', (e) => { 
                 if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
                 isDrawing = true; 
+                if(spraySound) spraySound.play().catch(err => console.log(err)); // Mainkan Suara
                 spray(e); 
             }, {passive: false});
             canvas.addEventListener('touchmove', spray, {passive: false});
-            canvas.addEventListener('touchend', () => { isDrawing = false; checkReveal(); });
+            canvas.addEventListener('touchend', () => { 
+                isDrawing = false; 
+                if(spraySound) spraySound.pause(); // Jeda Suara
+                checkReveal(); 
+            });
         }
 
         // Cek progres gosokan
@@ -628,8 +646,8 @@
             const total = pixels.length / 128;
             const percentage = (transparent / total) * 100;
             
-            // 25% area terhapus = selesai
-            if (percentage > 25) {
+            // 80% area terhapus = selesai
+            if (percentage > 80) {
                 completeSpray();
             }
         }
@@ -637,6 +655,8 @@
         // Buka web utama
         function completeSpray() {
             scratchCompleted = true;
+            if(spraySound) spraySound.pause(); // Matikan suara total
+            
             const instruction = document.getElementById('spray-instruction');
             if(instruction) instruction.style.opacity = '0';
             if(customSprayCursor) customSprayCursor.style.opacity = '0';
