@@ -545,6 +545,8 @@
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
+        let sprayCount = 0; // Tambahan counter untuk menghindari lag saat cek
+
         // Fungsi mencoret / Spray
         function spray(evt) {
             if (!isDrawing || scratchCompleted || !ctx) return;
@@ -562,6 +564,12 @@
             ctx.beginPath();
             ctx.arc(pos.x, pos.y, 60, 0, Math.PI * 2, false);
             ctx.fill();
+
+            // Cek real-time saat digosok (setiap 15 coretan agar tidak lag)
+            sprayCount++;
+            if (sprayCount % 15 === 0) {
+                checkReveal();
+            }
         }
 
         // Custom Cursor & Event listeners
