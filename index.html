@@ -19,6 +19,7 @@
                     },
                     fontFamily: {
                         sans: ['Space Grotesk', 'sans-serif'],
+                        aerosoldier: ['Aerosoldier', 'sans-serif'],
                     },
                     animation: {
                         'marquee': 'marquee 25s linear infinite',
@@ -46,6 +47,15 @@
         }
     </script>
     <style>
+        /* IMPORT CUSTOM FONT GRAFFITI */
+        @font-face {
+            font-family: 'Aerosoldier';
+            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/AerosoldierDrip_PERSONAL_USE_ONLY.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
         body {
             background-color: #050505;
             color: #f3f4f6;
@@ -158,12 +168,11 @@
             </a>
 
             <!-- Desktop Menu (Now solid black) -->
-            <div class="hidden md:flex space-x-8 items-center text-sm font-extrabold tracking-wide text-black">
+            <div class="hidden md:flex space-x-8 items-center text-sm font-extrabold tracking-wide text-black mt-2">
                 <a href="#home" class="hover:opacity-50 transition-opacity">HOME</a>
                 <a href="#collection" class="hover:opacity-50 transition-opacity">COLLECTION</a>
                 <a href="#roadmap" class="hover:opacity-50 transition-opacity">ROADMAP</a>
-                <a href="#merch" class="hover:opacity-50 transition-opacity">MERCH</a>
-                <a href="#wl" class="hover:opacity-50 transition-opacity">WL APP</a>
+                <a href="whitelist.html" target="_blank" class="hover:opacity-50 transition-opacity">WHITELIST</a>
             </div>
 
             <!-- Mobile Navbar Elements -->
@@ -180,8 +189,7 @@
              <a href="#home" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">HOME</a>
              <a href="#collection" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">COLLECTION</a>
              <a href="#roadmap" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">ROADMAP</a>
-             <a href="#merch" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">MERCH</a>
-             <a href="#wl" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity">WL APP</a>
+             <a href="whitelist.html" target="_blank" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity">WHITELIST</a>
         </div>
     </nav>
 
@@ -207,11 +215,12 @@
             </h2>
             
             <div class="relative scroll-parallax" data-speed="0.4">
-                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase relative z-10">
+                <!-- AEROSOLDIER FONT APPLIED -->
+                <h1 class="text-6xl md:text-[8rem] lg:text-[11rem] font-aerosoldier font-normal leading-none tracking-tighter uppercase relative z-10">
                     GREEN<span class="text-neon">BOYZ</span>
                 </h1>
                 <!-- Glitch/Echo effect text behind -->
-                <h1 class="text-5xl md:text-8xl lg:text-[10rem] font-bold leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
+                <h1 class="text-6xl md:text-[8rem] lg:text-[11rem] font-aerosoldier font-normal leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
                     GREENBOYZ
                 </h1>
             </div>
@@ -221,7 +230,7 @@
             </p>
 
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center scroll-parallax" data-speed="0.8">
-                <a href="#wl" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
+                <a href="whitelist.html" target="_blank" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
                     Join Allowlist
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                 </a>
@@ -272,7 +281,8 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                 <div>
                     <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// GENESIS DROP</h3>
-                    <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">The <span class="text-outline">Collection</span></h2>
+                    <!-- AEROSOLDIER FONT APPLIED -->
+                    <h2 class="text-4xl md:text-6xl font-aerosoldier font-normal uppercase tracking-tighter">The <span class="text-outline">Collection</span></h2>
                 </div>
                 <p class="text-gray-400 max-w-md text-sm">
                     Each avatar is procedurally generated from over 300 hand-drawn streetwear traits. Hoodies, sneakers, tech-wear, and artifacts.
@@ -307,38 +317,44 @@
     </section>
 
     <section id="roadmap" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden">
-        <!-- Blueprint Grid Background -->
-        <div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: linear-gradient(rgba(204,255,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(204,255,0,0.5) 1px, transparent 1px); background-size: 50px 50px;"></div>
+        
+        <!-- NEW Custom Image Blueprint Background (Isolasi line art & recolor ke Neon Green) -->
+        <div class="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
+            <div class="relative w-full h-full bg-black">
+                <!-- invert(1) mengubah BG putih jadi hitam dan garis hitam jadi putih. grayscale(1) membuang sisa warna. -->
+                <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2011%20Jul%202026%2C%2002.00.37.png" class="absolute inset-0 w-full h-full object-cover" style="filter: invert(1) grayscale(1) contrast(150%);">
+                <!-- Overlay ini mewarnai garis yang sudah jadi putih tadi menjadi warna neon (karena efek multiply) -->
+                <div class="absolute inset-0 bg-neon mix-blend-multiply"></div>
+            </div>
+        </div>
 
         <!-- Parallax Background Text -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-5">
-            <h2 class="text-[15vw] font-bold uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
+            <!-- AEROSOLDIER FONT APPLIED -->
+            <h2 class="text-[12vw] md:text-[15vw] font-aerosoldier font-normal uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
         </div>
 
         <div class="max-w-5xl mx-auto relative z-10">
             <div class="text-center mb-16">
                 <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// THE ROUTE</h3>
-                <h2 class="text-4xl md:text-6xl font-bold uppercase tracking-tighter">Skate <span class="text-outline">Blueprint</span></h2>
+                <!-- AEROSOLDIER FONT APPLIED -->
+                <h2 class="text-4xl md:text-6xl font-aerosoldier font-normal uppercase tracking-tighter">Skate <span class="text-outline">Blueprint</span></h2>
             </div>
 
             <div class="relative w-full py-10">
                 <!-- SVG Skate Route Path (Desktop Only) -->
                 <div class="absolute inset-0 hidden md:block w-full h-full pointer-events-none">
-                    <svg width="100%" height="100%" viewBox="0 0 1000 700" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Blueprint dimension lines -->
-                        <path d="M 0 100 L 1000 100" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
-                        <path d="M 0 350 L 1000 350" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
-                        <path d="M 0 600 L 1000 600" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="5 5" />
-                        
-                        <!-- Main Skate Route Line (S-Curve Ramp) -->
-                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
+                    <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Main Skate Route Line (S-Curve Ramp extended to 4th node) -->
+                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650 C 150 850, 850 750, 850 950" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
                         <!-- Outline glow for neon effect -->
-                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
+                        <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650 C 150 850, 850 750, 850 950" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
                         
                         <!-- Route nodes -->
                         <circle cx="150" cy="50" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                         <circle cx="850" cy="350" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                         <circle cx="150" cy="650" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
+                        <circle cx="850" cy="950" r="8" fill="#050505" stroke="#CCFF00" stroke-width="4"/>
                     </svg>
                 </div>
 
@@ -368,86 +384,36 @@
                     <div class="relative md:absolute md:top-[600px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">03</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Air Time</h4>
-                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Phygital Merch</h3>
-                        <p class="text-gray-400 text-xs md:text-sm">Holders claim physical streetwear items matching their NFT. NFC tags embedded for blockchain verification on the streets.</p>
+                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Greengirlz</h3>
+                        <p class="text-gray-400 text-xs md:text-sm">Launch of the follow-up collection for the second collection of GREENGIRLZ, all holders of the first collection (GREENBOYZ) are entitled to a free mint.</p>
                         <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">PIPE_C // X150:Y650</div>
                     </div>
 
-                    <!-- Layout Spacer for desktop to match absolute heights -->
-                    <div class="hidden md:block w-full h-[750px] pointer-events-none"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="merch" class="py-24 px-6 md:px-12 bg-transparent relative z-10">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
-            <!-- Image Side -->
-            <div class="w-full lg:w-1/2 relative group">
-                <!-- Decorative background elements -->
-                <div class="absolute inset-0 bg-neon translate-x-4 translate-y-4 -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500"></div>
-                
-                <div class="bg-graydark aspect-square w-full border border-white/10 flex items-center justify-center relative overflow-hidden">
-                    <div class="text-center z-10">
-                        <div class="w-32 h-48 border-2 border-neon/50 mx-auto mb-4 relative">
-                            <!-- Hoodie Placeholder Graphic -->
-                            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-8 border-b-2 border-neon/50 rounded-b-full"></div>
-                            <div class="absolute top-8 left-1/4 w-1/2 h-full border-t-2 border-neon/50"></div>
-                        </div>
-                        <h4 class="uppercase tracking-widest font-bold text-xl text-white">Genesis Hoodie</h4>
-                        <p class="text-neon font-mono text-sm mt-2">NFC ENABLED // NFC-001</p>
+                    <!-- Phase 4 -->
+                    <div class="relative md:absolute md:top-[900px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] transition-all z-10">
+                        <div class="absolute -top-4 -right-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">04</div>
+                        <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">Freestyle</h4>
+                        <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">Beyond NFTs</h3>
+                        <p class="text-gray-400 text-xs md:text-sm">The vision is bigger than NFTs. Merch, games, retail, new brand, where it goes depends on what we build and earn along the way.</p>
+                        <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">STREET_D // X850:Y950</div>
                     </div>
-                    <!-- Glitch lines -->
-                    <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSJ0cmFuc3BhcmVudCI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDRaIiBzdHJva2U9IiMyMjIiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=')] opacity-30"></div>
+
+                    <!-- Layout Spacer for desktop to match absolute heights -->
+                    <div class="hidden md:block w-full h-[1150px] pointer-events-none"></div>
                 </div>
-            </div>
-
-            <!-- Text Side -->
-            <div class="w-full lg:w-1/2">
-                <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// HOLDER EXCLUSIVE</h3>
-                <h2 class="text-4xl md:text-5xl font-bold uppercase tracking-tighter mb-6">Wear Your <br><span class="text-outline">Digital Asset</span></h2>
-                <p class="text-gray-400 mb-8 text-lg">
-                    We are not just a JPEG. GREENBOYZ is a lifestyle brand. Every NFT in the genesis collection acts as a mint pass for our premium, NFC-enabled physical streetwear drops. Scan the tag on your hoodie to prove ownership on-chain.
-                </p>
-                
-                <ul class="space-y-4 mb-10 text-sm font-mono text-gray-300">
-                    <li class="flex items-center gap-3">
-                        <span class="text-neon">✓</span> Heavyweight 450gsm French Terry
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <span class="text-neon">✓</span> Embedded Secure NFC Chip
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <span class="text-neon">✓</span> Exclusive to NFT Holders Only
-                    </li>
-                </ul>
-
-                <button class="bg-transparent border border-white text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
-                    View Lookbook
-                </button>
             </div>
         </div>
     </section>
 
     <section id="wl" class="py-24 px-6 md:px-12 bg-neon text-black clip-path-slant relative -mb-10 pt-32 pb-40 z-20">
         <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-5xl md:text-7xl font-bold uppercase tracking-tighter mb-6">Join <br>GREENBOYZ</h2>
-            <p class="font-medium max-w-xl mx-auto mb-10">Allowlist spots are limited and hand-picked. Connect your Twitter and Discord to apply for the Genesis Mint.</p>
+            <!-- AEROSOLDIER FONT APPLIED -->
+            <h2 class="text-5xl md:text-7xl font-aerosoldier font-normal uppercase tracking-tighter mb-6">Join <br>GREENBOYZ</h2>
+            <p class="font-medium max-w-xl mx-auto mb-10">Allowlist spots are limited and hand-picked. Apply for the Genesis Mint.</p>
             
-            <form class="max-w-md mx-auto space-y-4" onsubmit="event.preventDefault(); alert('Form submitted! (Demo only)');">
-                <input type="email" placeholder="ENTER EMAIL ADDRESS" class="w-full bg-black text-white px-6 py-4 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-white border border-black placeholder:text-gray-600" required>
-                <div class="grid grid-cols-2 gap-4">
-                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">
-                        Discord
-                    </button>
-                    <button type="button" class="bg-black text-white px-6 py-4 font-bold uppercase hover:bg-white hover:text-black transition-colors border border-black flex items-center justify-center gap-2">
-                        Twitter
-                    </button>
-                </div>
-                <button type="submit" class="w-full bg-transparent border-2 border-black text-black px-6 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-colors mt-4">
-                    Submit Application
-                </button>
-            </form>
+            <a href="whitelist.html" target="_blank" class="inline-block bg-transparent border-2 border-black text-black px-12 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-colors mt-4">
+                Submit Application
+            </a>
         </div>
     </section>
 
@@ -460,7 +426,7 @@
             
             <div class="flex gap-6 font-mono text-sm text-gray-500">
                 <a href="#" class="hover:text-neon transition-colors">Opensea</a>
-                <a href="#" class="hover:text-neon transition-colors">Twitter</a>
+                <a href="#" class="hover:text-neon transition-colors">X</a>
                 <a href="#" class="hover:text-neon transition-colors">Discord</a>
                 <a href="#" class="hover:text-neon transition-colors">Etherscan</a>
             </div>
