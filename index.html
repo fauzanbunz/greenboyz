@@ -581,7 +581,7 @@
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        let sprayCount = 0; // Tambahan counter untuk menghindari lag saat cek
+        let lastCheckTime = 0; // Menggunakan timer waktu agar tidak lag
 
         // Fungsi mencoret / Spray
         function spray(evt) {
@@ -601,10 +601,12 @@
             ctx.arc(pos.x, pos.y, 60, 0, Math.PI * 2, false);
             ctx.fill();
 
-            // Cek real-time saat digosok (setiap 15 coretan agar tidak lag)
-            sprayCount++;
-            if (sprayCount % 15 === 0) {
-                checkReveal();
+            // Cek persentase layar maksimal tiap 500ms (setengah detik)
+            const now = Date.now();
+            if (now - lastCheckTime > 500) {
+                lastCheckTime = now;
+                // Eksekusi di luar antrean render utama agar spray tetap mulus
+                requestAnimationFrame(checkReveal);
             }
         }
 
