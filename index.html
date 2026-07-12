@@ -194,6 +194,15 @@
     </nav>
 
     <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent">
+        
+        <!-- NEW: Left & Right Half-Images (Scroll Parallax) -->
+        <div id="hero-img-left" class="absolute top-1/2 left-0 w-[250px] md:w-[500px] z-0 pointer-events-none will-change-transform" style="transform: translate(-50%, -50%);">
+            <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2013%20Jul%202026%2C%2001.34.45.png" class="w-full h-auto opacity-80 drop-shadow-[0_0_20px_rgba(204,255,0,0.2)]">
+        </div>
+        <div id="hero-img-right" class="absolute top-1/2 right-0 w-[250px] md:w-[500px] z-0 pointer-events-none will-change-transform" style="transform: translate(50%, -50%);">
+            <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2013%20Jul%202026%2C%2001.34.45.png" class="w-full h-auto opacity-80 scale-x-[-1] drop-shadow-[0_0_20px_rgba(204,255,0,0.2)]">
+        </div>
+
         <!-- Abstract Parallax Background Elements -->
         <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
             <!-- Grid overlay -->
@@ -474,10 +483,37 @@
         // --- SCROLL PARALLAX EFFECT ---
         window.addEventListener('scroll', () => {
             let scroll = window.scrollY;
+            
+            // Text scroll parallax
             document.querySelectorAll('.scroll-parallax').forEach(el => {
                 let speed = el.getAttribute('data-speed');
                 el.style.transform = `translateY(${scroll * speed}px)`;
             });
+
+            // Animasi menjauh untuk gambar kanan/kiri di Landing Page
+            const heroImgLeft = document.getElementById('hero-img-left');
+            const heroImgRight = document.getElementById('hero-img-right');
+            const collectionSection = document.getElementById('collection');
+
+            if (heroImgLeft && heroImgRight && collectionSection) {
+                let collectionTop = collectionSection.offsetTop;
+                let ratio = scroll / collectionTop;
+                
+                // Batasi ratio agar maksimal = 1 (saat mencapai The Collection)
+                if (ratio < 0) ratio = 0;
+                if (ratio > 1) ratio = 1;
+
+                // Pergerakan X: Mulai dari 50% (separuh layar) menuju 150% (sepenuhnya keluar tepi)
+                let moveLeft = -50 - (ratio * 100);
+                let moveRight = 50 + (ratio * 100);
+
+                heroImgLeft.style.transform = `translate(${moveLeft}%, -50%)`;
+                heroImgRight.style.transform = `translate(${moveRight}%, -50%)`;
+                
+                // Mengurangi transisi opacity agar memudar saat menjauh
+                heroImgLeft.style.opacity = 1 - ratio;
+                heroImgRight.style.opacity = 1 - ratio;
+            }
         });
 
         // --- LOADING & SPRAY PAGE LOGIC ---
