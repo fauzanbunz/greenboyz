@@ -23,6 +23,7 @@
                     },
                     animation: {
                         'marquee': 'marquee 25s linear infinite',
+                        'marquee-slow': 'marquee 15s linear infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'diagonal': 'diagonal 40s linear infinite',
                         'slime': 'slime 3.5s ease-in-out infinite alternate',
@@ -30,7 +31,7 @@
                     },
                     keyframes: {
                         marquee: {
-                            '0%': { transform: 'translateX(0%)' },
+                            '0%': { transform: 'translateX(100%)' },
                             '100%': { transform: 'translateX(-100%)' },
                         },
                         diagonal: {
@@ -40,6 +41,10 @@
                         slime: {
                             '0%': { transform: 'scaleY(0.9)' },
                             '100%': { transform: 'scaleY(1.3)' },
+                        },
+                        eq: {
+                            '0%': { height: '4px' },
+                            '100%': { height: '16px' }
                         }
                     }
                 }
@@ -96,14 +101,25 @@
             clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
         }
 
-        /* Hide scrollbar for marquee container but keep functionality */
         .marquee-container::-webkit-scrollbar {
             display: none;
         }
 
-        /* Custom Spray Cursor */
-        .cursor-spray {
-            cursor: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg') 12 12, crosshair;
+        /* Eq Animation Bars */
+        .eq-bar {
+            width: 4px;
+            background-color: #CCFF00;
+            border-radius: 2px;
+            animation: eq 0.5s ease-in-out infinite alternate;
+        }
+        .eq-bar:nth-child(2) { animation-duration: 0.7s; }
+        .eq-bar:nth-child(3) { animation-duration: 0.9s; }
+        .eq-bar:nth-child(4) { animation-duration: 0.6s; }
+        
+        /* Pause animation when music stops */
+        .eq-paused .eq-bar {
+            animation-play-state: paused;
+            height: 4px !important;
         }
     </style>
 </head>
@@ -112,72 +128,91 @@
     <!-- Loading Screen -->
     <div id="loader" class="fixed inset-0 z-[100] bg-neon flex flex-col items-center justify-center transition-opacity duration-700 opacity-100">
         <div class="relative">
-            <!-- Logo baru tanpa lingkaran hitam -->
             <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/GB%20logo.svg" alt="Loading" class="w-32 h-32 md:w-48 md:h-48 animate-bounce drop-shadow-2xl">
         </div>
         <div id="loading-text" class="mt-10 font-mono font-bold text-black tracking-widest text-lg animate-pulse uppercase">Loading Sector 7G...</div>
         
-        <!-- Tombol LET'S SKATE (muncul setelah 5 detik) -->
         <button id="btn-lets-skate" class="hidden mt-8 px-8 py-4 border-4 border-black bg-transparent text-black font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-all animate-pulse text-xl">
             Let's Skate!
         </button>
     </div>
 
-    <!-- Spray Page (Muncu setelah klik Let's Skate) -->
+    <!-- Spray Page -->
     <div id="spray-page" class="fixed inset-0 z-[90] bg-black hidden flex-col items-center justify-center transition-opacity duration-1000 opacity-100 cursor-none">
-        <!-- Logo Text Tersembunyi di belakang canvas -->
+        <!-- Logo Text -->
         <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="absolute w-4/5 md:w-1/2 max-w-2xl opacity-100 pointer-events-none drop-shadow-[0_0_20px_rgba(204,255,0,0.4)]">
         
-        <div id="spray-instruction" class="absolute top-24 text-neon font-mono text-sm tracking-widest animate-pulse pointer-events-none text-center z-10">
+        <!-- NEW: Let's Go Button (Muncul setelah spray 20%) -->
+        <button id="btn-lets-go" class="opacity-0 pointer-events-none absolute top-[60%] md:top-[65%] z-20 px-10 py-4 border-2 border-neon bg-black/80 text-neon font-bold uppercase tracking-widest hover:bg-neon hover:text-black transition-all duration-500 backdrop-blur-sm shadow-[0_0_20px_rgba(204,255,0,0.3)] hover:shadow-[0_0_30px_rgba(204,255,0,0.6)] cursor-pointer">
+            Let's Go!
+        </button>
+        
+        <div id="spray-instruction" class="absolute top-24 text-neon font-mono text-sm tracking-widest animate-pulse pointer-events-none text-center z-10 transition-opacity duration-500">
             [ SPRAY THE WALL ]<br><span class="text-xs text-gray-500 mt-2 block">Use cursor/finger to scratch the black screen</span>
         </div>
 
-        <!-- Canvas untuk efek Spray/Scratch -->
         <canvas id="spray-canvas" class="absolute inset-0 w-full h-full cursor-none touch-none"></canvas>
 
-        <!-- Custom JS Cursor for Spray -->
         <img id="custom-spray-cursor" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/spray.svg" class="fixed pointer-events-none z-[100] w-12 h-12 -translate-x-[50%] -translate-y-[50%] opacity-0 transition-opacity duration-150 drop-shadow-[0_0_8px_rgba(204,255,0,0.6)]">
         
-        <!-- Audio Efek Spray -->
         <audio id="spray-sound" src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/soundreality-spray-178360%20(mp3cut.net).mp3" preload="auto" loop></audio>
     </div>
+
+    <!-- NEW: Floating Music HUD Player -->
+    <div id="music-hud" class="fixed bottom-6 right-6 z-[95] hidden bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl flex items-center gap-4 transition-all hover:bg-black/60 hover:border-neon/50 shadow-lg">
+        <!-- Play/Pause Toggle -->
+        <button id="music-toggle" class="text-neon hover:text-white transition-colors focus:outline-none flex-shrink-0">
+            <svg id="icon-pause" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            <svg id="icon-play" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        
+        <!-- Real-time Audio Visualizer Canvas (Ganti div EQ lama dengan ini) -->
+        <canvas id="music-visualizer" width="40" height="24" class="flex-shrink-0"></canvas>
+
+        <!-- Song Title Marquee -->
+        <div class="overflow-hidden w-24 relative flex items-center">
+            <!-- Fade mask effect on edges -->
+            <div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(90deg, #000 0%, transparent 10%, transparent 90%, #000 100%); mix-blend-mode: multiply;"></div>
+            <p id="music-title" class="text-xs font-mono text-gray-300 whitespace-nowrap animate-marquee-slow">
+                Loading...
+            </p>
+        </div>
+
+        <!-- Next Track Button -->
+        <button id="music-next" class="text-gray-400 hover:text-neon transition-colors focus:outline-none flex-shrink-0 ml-1">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+    </div>
+    
+    <!-- Hidden Audio Player for BGM (WAJIB tambah crossorigin="anonymous" untuk Visualizer) -->
+    <audio id="bgm-player" preload="metadata" crossorigin="anonymous"></audio>
 
     <!-- Global Continuous Diagonal Pattern Background -->
     <div class="fixed inset-0 z-[-5] bg-dark pointer-events-none">
         <div class="absolute inset-0 bg-[url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gblogo.jpg')] bg-repeat animate-diagonal grayscale opacity-[0.08] mix-blend-lighten" style="background-size: 300px 300px;"></div>
     </div>
 
+    <!-- Navigation Navbar -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300">
-        <!-- Slime Dripping Background Area -->
         <div class="absolute inset-0 top-0 left-0 w-full pointer-events-none -z-10 flex flex-col drop-shadow-[0_10px_15px_rgba(204,255,0,0.15)]">
-            <!-- Blok Solid Panel yang ditarik lebih ke bawah (150px untuk mobile, 180px untuk desktop) -->
             <div class="w-full bg-neon h-[150px] md:h-[180px]"></div>
-            
-            <!-- SVG Lendir diletakkan tepat di bawah blok solid -->
             <svg viewBox="0 0 1000 450" preserveAspectRatio="none" class="w-full h-48 md:h-[250px] text-neon fill-current -mt-1">
                 <path class="animate-slime-slow origin-top opacity-50" d="M0,0 L1000,0 L1000,80 C950,280 900,20 850,120 C800,250 750,50 700,160 C650,280 600,20 550,100 C500,180 450,350 400,130 C350,-50 300,220 250,320 C200,420 150,80 100,180 C50,280 25,50 0,100 Z"/>
                 <path class="animate-slime origin-top" d="M0,0 L1000,0 L1000,20 C980,80 960,220 940,80 C920,-30 900,20 880,130 C860,250 840,100 820,50 C800,0 780,160 760,280 C740,400 720,50 700,50 C680,50 660,250 640,160 C620,80 600,0 580,50 C560,100 540,380 520,250 C500,100 480,50 460,100 C440,160 420,280 400,160 C380,50 360,20 340,80 C320,130 300,350 280,180 C260,20 240,50 220,130 C200,220 180,80 160,50 C140,20 120,160 100,280 C80,400 60,80 40,50 C20,20 10,100 0,50 Z" />
             </svg>
         </div>
 
-        <!-- Posisi logo dan menu ditarik ke atas menggunakan pt-4 dan md:pt-6 -->
         <div class="max-w-7xl mx-auto flex justify-between items-start pt-4 md:pt-6 px-6 md:px-12 relative z-10 h-[150px] md:h-[180px]">
-            <!-- Logo (Now changed to black using CSS filter brightness-0) -->
             <a href="#" class="flex items-center gap-2">
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-10 md:h-12 brightness-0">
             </a>
-
-            <!-- Desktop Menu (Now solid black) -->
             <div class="hidden md:flex space-x-8 items-center text-sm font-extrabold tracking-wide text-black mt-2">
                 <a href="#home" class="hover:opacity-50 transition-opacity">HOME</a>
                 <a href="#collection" class="hover:opacity-50 transition-opacity">COLLECTION</a>
                 <a href="#blueprint" class="hover:opacity-50 transition-opacity">BLUEPRINT</a>
                 <a href="whitelist.html" target="_blank" class="hover:opacity-50 transition-opacity">WHITELIST</a>
             </div>
-
-            <!-- Mobile Navbar Elements -->
             <div class="flex items-center gap-4 md:hidden mt-2">
-                <!-- Mobile Menu Button (Now Black) -->
                 <button class="text-black focus:outline-none hover:opacity-50 transition-opacity" id="mobile-menu-btn">
                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
@@ -195,7 +230,7 @@
 
     <header id="home" class="relative h-screen flex items-center justify-center overflow-hidden bg-transparent">
         
-        <!-- NEW: Left & Right Half-Images (Scroll Parallax) -->
+        <!-- Left & Right Half-Images (Scroll Parallax) -->
         <div id="hero-img-left" class="absolute top-1/2 left-0 w-[250px] md:w-[500px] z-0 pointer-events-none will-change-transform" style="transform: translate(-50%, -50%);">
             <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2013%20Jul%202026%2C%2001.34.45.png" class="w-full h-auto opacity-80 drop-shadow-[0_0_20px_rgba(204,255,0,0.2)]">
         </div>
@@ -203,12 +238,8 @@
             <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2013%20Jul%202026%2C%2001.34.45.png" class="w-full h-auto opacity-80 scale-x-[-1] drop-shadow-[0_0_20px_rgba(204,255,0,0.2)]">
         </div>
 
-        <!-- Abstract Parallax Background Elements -->
         <div class="absolute inset-0 z-0 pointer-events-none flex items-center justify-center">
-            <!-- Grid overlay -->
             <div class="absolute inset-0" style="background-image: linear-gradient(#111 1px, transparent 1px), linear-gradient(90deg, #111 1px, transparent 1px); background-size: 50px 50px; opacity: 0.3;"></div>
-            
-            <!-- Floating Elements (Mouse Parallax) -->
             <div class="absolute top-1/4 left-1/4 w-64 h-64 border border-neon/30 rounded-full mouse-parallax" data-speed="-2"></div>
             <div class="absolute bottom-1/4 right-1/4 w-96 h-96 border border-white/5 rotate-45 mouse-parallax" data-speed="3"></div>
             <div class="absolute top-1/2 right-1/3 w-32 h-32 bg-neon/5 blur-3xl rounded-full mouse-parallax" data-speed="1"></div>
@@ -217,18 +248,15 @@
             </div>
         </div>
 
-        <!-- Main Hero Content (Scroll Parallax) -->
         <div class="relative z-10 text-center w-full max-w-6xl px-4 flex flex-col items-center pt-20">
             <h2 class="text-neon tracking-widest text-sm md:text-base font-bold mb-4 uppercase scroll-parallax" data-speed="0.2">
                 [ HAND-DRAWN collection ]
             </h2>
             
             <div class="relative scroll-parallax" data-speed="0.4">
-                <!-- AEROSOLDIER FONT APPLIED -->
                 <h1 class="text-6xl md:text-[8rem] lg:text-[11rem] font-aerosoldier font-normal leading-none tracking-tighter uppercase relative z-10">
                     GREEN<span class="text-neon">BOYZ</span>
                 </h1>
-                <!-- Glitch/Echo effect text behind -->
                 <h1 class="text-6xl md:text-[8rem] lg:text-[11rem] font-aerosoldier font-normal leading-none tracking-tighter uppercase text-outline absolute top-2 -left-2 md:top-4 md:-left-4 -z-10 opacity-50">
                     GREENBOYZ
                 </h1>
@@ -249,7 +277,6 @@
             </div>
         </div>
         
-        <!-- Scroll Indicator -->
         <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce opacity-50">
             <span class="text-xs tracking-widest uppercase mb-2">Scroll</span>
             <div class="w-px h-12 bg-gradient-to-b from-neon to-transparent"></div>
@@ -257,31 +284,13 @@
     </header>
 
     <div class="bg-neon text-black py-3 overflow-hidden flex flex-nowrap border-y border-white/20 relative z-20">
-        <!-- First group -->
         <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4">
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span>
         </div>
-        <!-- Second group (duplicate for seamless loop) -->
         <div class="animate-marquee flex items-center gap-8 shrink-0 min-w-full justify-around font-bold text-xl uppercase tracking-widest px-4" aria-hidden="true">
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
-            <span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span>
+            <span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span><span>• GREENBOYZ</span>
         </div>
     </div>
 
@@ -290,7 +299,6 @@
             <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
                 <div>
                     <h3 class="text-neon text-sm font-mono tracking-widest mb-2">// GENESIS DROP</h3>
-                    <!-- AEROSOLDIER FONT APPLIED -->
                     <h2 class="text-4xl md:text-6xl font-aerosoldier font-normal uppercase tracking-tighter">The <span class="text-outline">Collection</span></h2>
                 </div>
                 <p class="text-gray-400 max-w-md text-sm">
@@ -298,15 +306,10 @@
                 </p>
             </div>
 
-            <!-- Single Frame for GIF -->
             <div class="flex justify-center w-full">
                 <div class="group relative border-neon-glow bg-graydark p-4 flex flex-col h-[400px] w-full max-w-sm">
                     <div class="w-full h-full bg-dark flex items-center justify-center overflow-hidden relative border border-white/5">
-                        
-                        <!-- Actual GIF File -->
                         <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ezgif.com-gif-maker.gif" alt="Genesis Drop GIF" class="absolute inset-0 w-full h-full object-cover z-0">
-                        
-                        <!-- Tech decorations -->
                         <div class="absolute top-2 left-2 w-4 h-4 border-t border-l border-neon/50 z-10"></div>
                         <div class="absolute top-2 right-2 w-4 h-4 border-t border-r border-neon/50 z-10"></div>
                         <div class="absolute bottom-2 left-2 w-4 h-4 border-b border-l border-neon/50 z-10"></div>
@@ -326,8 +329,6 @@
     </section>
 
     <section id="blueprint" class="py-24 px-6 md:px-12 bg-graydark border-y border-white/10 relative overflow-hidden">
-        
-        <!-- Custom Image Blueprint Background -->
         <div class="absolute inset-0 z-0 pointer-events-none opacity-40 mix-blend-screen">
             <div class="relative w-full h-full bg-black">
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2011%20Jul%202026%2C%2002.00.37.png" class="absolute inset-0 w-full h-full object-cover" style="filter: invert(1) grayscale(1) contrast(150%);">
@@ -335,7 +336,6 @@
             </div>
         </div>
 
-        <!-- Parallax Background Text -->
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none opacity-5">
             <h2 class="text-[12vw] md:text-[15vw] font-aerosoldier font-normal uppercase leading-none scroll-parallax" data-speed="-0.3">BLUEPRINT</h2>
         </div>
@@ -350,10 +350,8 @@
             </div>
 
             <div class="relative w-full py-10">
-                <!-- SVG Skate Route Path Lines (Diperpanjang ke 5 Titik) -->
                 <div class="absolute inset-0 hidden md:block w-full h-full pointer-events-none">
                     <svg width="100%" height="100%" viewBox="0 0 1000 1300" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Main Ramp Curve Route 5 Nodes -->
                         <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650 C 150 850, 850 750, 850 950 C 850 1150, 150 1050, 150 1250" stroke="#CCFF00" stroke-width="4" stroke-linecap="round"/>
                         <path d="M 150 50 C 150 250, 850 150, 850 350 C 850 550, 150 450, 150 650 C 150 850, 850 750, 850 950 C 850 1150, 150 1050, 150 1250" stroke="#CCFF00" stroke-width="12" stroke-linecap="round" opacity="0.2" filter="blur(4px)"/>
                         
@@ -365,10 +363,7 @@
                     </svg>
                 </div>
 
-                <!-- Phase Items Details (Dengan efek scroll-reveal) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0 relative">
-                    
-                    <!-- Phase 1 -->
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out relative md:absolute md:top-[0px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">01</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🧵 Phase I</h4>
@@ -377,7 +372,6 @@
                         <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">NODE_A // X150:Y50</div>
                     </div>
 
-                    <!-- Phase 2 -->
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-100 relative md:absolute md:top-[300px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
                         <div class="absolute -top-4 -right-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">02</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">💧 Phase II</h4>
@@ -386,7 +380,6 @@
                         <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">NODE_B // X850:Y350</div>
                     </div>
 
-                    <!-- Phase 3 -->
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-200 relative md:absolute md:top-[600px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">03</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🛠️ Phase III</h4>
@@ -395,7 +388,6 @@
                         <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">NODE_C // X150:Y650</div>
                     </div>
 
-                    <!-- Phase 4 -->
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-300 relative md:absolute md:top-[900px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
                         <div class="absolute -top-4 -right-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">04</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🥀 Phase IV</h4>
@@ -404,7 +396,6 @@
                         <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">NODE_D // X850:Y950</div>
                     </div>
 
-                    <!-- Phase 5 -->
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-500 relative md:absolute md:top-[1200px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
                         <div class="absolute -top-4 -left-4 w-8 h-8 bg-neon flex items-center justify-center font-bold text-black text-sm border-2 border-dark">05</div>
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🌍 Phase V</h4>
@@ -413,7 +404,6 @@
                         <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">NODE_E // X150:Y1250</div>
                     </div>
 
-                    <!-- Layout Spacer for desktop to match absolute heights -->
                     <div class="hidden md:block w-full h-[1450px] pointer-events-none"></div>
                 </div>
             </div>
@@ -422,10 +412,8 @@
 
     <section id="wl" class="py-24 px-6 md:px-12 bg-neon text-black clip-path-slant relative -mb-10 pt-32 pb-40 z-20">
         <div class="max-w-4xl mx-auto text-center">
-            <!-- AEROSOLDIER FONT APPLIED -->
             <h2 class="text-5xl md:text-7xl font-aerosoldier font-normal uppercase tracking-tighter mb-6">Join <br>GREENBOYZ</h2>
             <p class="font-medium max-w-xl mx-auto mb-10">Allowlist spots are limited and hand-picked. Apply for the Genesis Mint.</p>
-            
             <a href="whitelist.html" target="_blank" class="inline-block bg-transparent border-2 border-black text-black px-12 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-colors mt-4">
                 Submit Application
             </a>
@@ -435,10 +423,8 @@
     <footer class="bg-black pt-24 pb-8 px-6 md:px-12 border-t border-white/10 relative z-10">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <a href="#" class="flex items-center gap-2">
-                <!-- Logo footer dibiarkan terang/putih agar terlihat di background hitam pekat -->
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-6 md:h-8">
             </a>
-            
             <div class="flex gap-6 font-mono text-sm text-gray-500">
                 <a href="#" class="hover:text-neon transition-colors">Opensea</a>
                 <a href="#" class="hover:text-neon transition-colors">X</a>
@@ -452,118 +438,183 @@
     </footer>
 
     <script>
-        // --- MENU INTERACTION ---
+        // --- MOBILE MENU ---
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
-        
         if (mobileBtn && mobileMenu) {
-            mobileBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-
-            // Close mobile menu on link click
+            mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
             mobileMenu.querySelectorAll('a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
-                });
+                link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
             });
         }
 
-        // --- MOUSE PARALLAX EFFECT (HERO) ---
-        document.addEventListener("mousemove", parallax);
-        function parallax(e) {
-            document.querySelectorAll(".mouse-parallax").forEach(function(move){
+        // --- PARALLAX EFFECTS ---
+        document.addEventListener("mousemove", (e) => {
+            document.querySelectorAll(".mouse-parallax").forEach(move => {
                 var moving_value = move.getAttribute("data-speed");
                 var x = (e.clientX - window.innerWidth / 2) * moving_value / 100;
                 var y = (e.clientY - window.innerHeight / 2) * moving_value / 100;
-                move.style.transform = "translateX(" + x + "px) translateY(" + y + "px)";
+                move.style.transform = `translateX(${x}px) translateY(${y}px)`;
             });
-        }
-
-        // --- SCROLL PARALLAX EFFECT ---
-        window.addEventListener('scroll', () => {
-            let scroll = window.scrollY;
-            
-            // Text scroll parallax
-            document.querySelectorAll('.scroll-parallax').forEach(el => {
-                let speed = el.getAttribute('data-speed');
-                el.style.transform = `translateY(${scroll * speed}px)`;
-            });
-
-            // Animasi menjauh untuk gambar kanan/kiri di Landing Page
-            const heroImgLeft = document.getElementById('hero-img-left');
-            const heroImgRight = document.getElementById('hero-img-right');
-            const collectionSection = document.getElementById('collection');
-
-            if (heroImgLeft && heroImgRight && collectionSection) {
-                let collectionTop = collectionSection.offsetTop;
-                let ratio = scroll / collectionTop;
-                
-                // Batasi ratio agar maksimal = 1 (saat mencapai The Collection)
-                if (ratio < 0) ratio = 0;
-                if (ratio > 1) ratio = 1;
-
-                // Pergerakan X: Mulai dari 50% (separuh layar) menuju 150% (sepenuhnya keluar tepi)
-                let moveLeft = -50 - (ratio * 100);
-                let moveRight = 50 + (ratio * 100);
-
-                heroImgLeft.style.transform = `translate(${moveLeft}%, -50%)`;
-                heroImgRight.style.transform = `translate(${moveRight}%, -50%)`;
-                
-                // Mengurangi transisi opacity agar memudar saat menjauh
-                heroImgLeft.style.opacity = 1 - ratio;
-                heroImgRight.style.opacity = 1 - ratio;
-            }
         });
 
-        // --- LOADING & SPRAY PAGE LOGIC ---
-        document.body.style.overflow = 'hidden'; // Lock scroll initially
+        // --- MUSIC HUD LOGIC & REAL-TIME VISUALIZER ---
+        // Daftar lagu terbaru dari GitHub
+        const playlist = [
+            { title: "We Are Green.mp3", url: "https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/we%20are%20green.mp3" },
+            { title: "Riot.mp3", url: "https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/riot.mp3" },
+            { title: "My Style.mp3", url: "https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/my%20style.mp3" },
+            { title: "Lazygun.mp3", url: "https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/lazygun.mp3" }
+        ];
+        
+        let currentTrack = 0;
+        const bgmPlayer = document.getElementById('bgm-player');
+        const musicHud = document.getElementById('music-hud');
+        const musicToggleBtn = document.getElementById('music-toggle');
+        const musicNextBtn = document.getElementById('music-next');
+        const iconPlay = document.getElementById('icon-play');
+        const iconPause = document.getElementById('icon-pause');
+        const musicTitle = document.getElementById('music-title');
 
+        // Web Audio API Variables for Visualizer
+        let audioCtx, analyser, dataArray, audioSource;
+        const visCanvas = document.getElementById('music-visualizer');
+        const visCtx = visCanvas ? visCanvas.getContext('2d') : null;
+
+        function initAudioVisualizer() {
+            if (audioCtx) return; // Mencegah inisialisasi ganda
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64; // Ukuran sample kecil (hanya butuh sedikit titik)
+                
+                const bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                
+                audioSource = audioCtx.createMediaElementSource(bgmPlayer);
+                audioSource.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                
+                drawVisualizer();
+            } catch (e) {
+                console.log("Web Audio API tidak didukung atau diblokir:", e);
+            }
+        }
+
+        function drawVisualizer() {
+            if(!visCtx) return;
+            requestAnimationFrame(drawVisualizer);
+
+            visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
+            visCtx.fillStyle = '#CCFF00'; // Warna Neon Green
+
+            if(bgmPlayer.paused) {
+                // Jika pause, gambar 4 titik diam di bawah
+                for(let i=0; i<4; i++) {
+                    visCtx.beginPath();
+                    visCtx.arc(5 + (i * 10), visCanvas.height - 3, 2.5, 0, Math.PI*2);
+                    visCtx.fill();
+                }
+                return;
+            }
+
+            // Ambil data frekuensi musik secara real-time
+            analyser.getByteFrequencyData(dataArray);
+
+            // Pilih 4 index frekuensi yang berbeda (Bass, Low-Mid, Mid, High)
+            const bins = [2, 6, 12, 18]; 
+
+            for(let i=0; i<4; i++) {
+                const freqValue = dataArray[bins[i]] || 0;
+                // Hitung tinggi pantulan titik (0 - 255 dikonversi ke skala canvas)
+                const percent = freqValue / 255;
+                const maxBounce = visCanvas.height - 6; 
+                const y = (visCanvas.height - 3) - (percent * maxBounce);
+
+                visCtx.beginPath();
+                visCtx.arc(5 + (i * 10), y, 2.5, 0, Math.PI*2);
+                visCtx.fill();
+            }
+        }
+
+        function loadTrack(index) {
+            bgmPlayer.src = playlist[index].url;
+            musicTitle.innerText = playlist[index].title;
+            bgmPlayer.load();
+        }
+
+        function playMusic() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            bgmPlayer.play().then(() => {
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+            }).catch(e => console.log("Audio autplay blocked by browser."));
+        }
+
+        function pauseMusic() {
+            bgmPlayer.pause();
+            iconPlay.classList.remove('hidden');
+            iconPause.classList.add('hidden');
+        }
+
+        musicToggleBtn.addEventListener('click', () => {
+            if(bgmPlayer.paused) playMusic();
+            else pauseMusic();
+        });
+
+        musicNextBtn.addEventListener('click', () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            loadTrack(currentTrack);
+            playMusic();
+        });
+
+        // Auto next track
+        bgmPlayer.addEventListener('ended', () => {
+            currentTrack = (currentTrack + 1) % playlist.length;
+            loadTrack(currentTrack);
+            playMusic();
+        });
+
+        // --- SPRAY LOGIC & LET'S GO BUTTON ---
+        document.body.style.overflow = 'hidden'; 
         const loader = document.getElementById('loader');
-        const loadingText = document.getElementById('loading-text');
         const btnLetsSkate = document.getElementById('btn-lets-skate');
         const sprayPage = document.getElementById('spray-page');
+        const btnLetsGo = document.getElementById('btn-lets-go');
         const canvas = document.getElementById('spray-canvas');
         const ctx = canvas ? canvas.getContext('2d') : null;
-        const spraySound = document.getElementById('spray-sound'); // Deklarasi Audio
+        const spraySound = document.getElementById('spray-sound');
         
         let isDrawing = false;
         let scratchCompleted = false;
+        let buttonRevealed = false;
 
-        // PENTING: Timer berjalan langsung tanpa menunggu file audio/gambar berat selesai didownload.
         setTimeout(() => {
-            if(loadingText && btnLetsSkate) {
-                loadingText.classList.add('hidden');
+            if(document.getElementById('loading-text') && btnLetsSkate) {
+                document.getElementById('loading-text').classList.add('hidden');
                 btnLetsSkate.classList.remove('hidden');
             }
         }, 5000);
 
-        // Aksi klik LET'S SKATE
-        if(btnLetsSkate) {
-            btnLetsSkate.addEventListener('click', () => {
-                // 1. Munculkan dan siapkan Spray Page TERLEBIH DAHULU di latar belakang (z-index 90)
-                if(sprayPage) {
-                    sprayPage.classList.remove('hidden');
-                    sprayPage.classList.add('flex');
-                }
-                initCanvas();
+        btnLetsSkate.addEventListener('click', () => {
+            if(sprayPage) {
+                sprayPage.classList.remove('hidden');
+                sprayPage.classList.add('flex');
+            }
+            initCanvas();
+            if(loader) {
+                loader.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => loader.style.display = 'none', 700);
+            }
+        });
 
-                // 2. Baru pudarkan layar Loader (z-index 100) sehingga yang terlihat adalah Spray Page
-                if(loader) {
-                    loader.classList.replace('opacity-100', 'opacity-0');
-                    setTimeout(() => {
-                        loader.style.display = 'none';
-                    }, 700);
-                }
-            });
-        }
-
-        // Setup Canvas Spray
         function initCanvas() {
             if(!canvas || !ctx) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            // Cat layar menjadi hitam full
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
@@ -572,7 +623,6 @@
             if (!scratchCompleted && sprayPage && sprayPage.style.display !== 'none') initCanvas();
         });
 
-        // Posisi kursor / sentuhan
         function getMousePos(evt) {
             if(!canvas) return {x:0, y:0};
             const rect = canvas.getBoundingClientRect();
@@ -581,17 +631,14 @@
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
 
-        let lastCheckTime = 0; // Menggunakan timer waktu agar tidak lag
+        let lastCheckTime = 0;
 
-        // Fungsi mencoret / Spray
         function spray(evt) {
             if (!isDrawing || scratchCompleted || !ctx) return;
             evt.preventDefault();
-            
             const pos = getMousePos(evt);
             
             ctx.globalCompositeOperation = 'destination-out';
-            
             const radGrad = ctx.createRadialGradient(pos.x, pos.y, 10, pos.x, pos.y, 60);
             radGrad.addColorStop(0, 'rgba(0,0,0,1)');
             radGrad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -601,25 +648,16 @@
             ctx.arc(pos.x, pos.y, 60, 0, Math.PI * 2, false);
             ctx.fill();
 
-            // Cek persentase layar maksimal tiap 500ms (setengah detik)
             const now = Date.now();
             if (now - lastCheckTime > 500) {
                 lastCheckTime = now;
-                // Eksekusi di luar antrean render utama agar spray tetap mulus
                 requestAnimationFrame(checkReveal);
             }
         }
 
-        // Custom Cursor & Event listeners
         const customSprayCursor = document.getElementById('custom-spray-cursor');
-
         if(canvas) {
-            // Mouse Events
-            canvas.addEventListener('mousedown', (e) => { 
-                isDrawing = true; 
-                if(spraySound) spraySound.play().catch(err => console.log(err)); // Mainkan Suara
-                spray(e); 
-            });
+            canvas.addEventListener('mousedown', (e) => { isDrawing = true; if(spraySound) spraySound.play().catch(e=>{}); spray(e); });
             canvas.addEventListener('mousemove', (e) => {
                 if(!scratchCompleted && customSprayCursor) {
                     customSprayCursor.style.opacity = '1';
@@ -628,100 +666,74 @@
                 }
                 spray(e);
             });
-            canvas.addEventListener('mouseup', () => { 
-                isDrawing = false; 
-                if(spraySound) spraySound.pause(); // Jeda Suara
-                checkReveal(); 
-            });
-            canvas.addEventListener('mouseleave', () => { 
-                isDrawing = false;
-                if(spraySound) spraySound.pause(); // Jeda Suara
-                if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
-            });
-
-            // Touch Events (HP)
-            canvas.addEventListener('touchstart', (e) => { 
-                if(customSprayCursor) customSprayCursor.style.opacity = '0'; 
-                isDrawing = true; 
-                if(spraySound) spraySound.play().catch(err => console.log(err)); // Mainkan Suara
-                spray(e); 
-            }, {passive: false});
+            canvas.addEventListener('mouseup', () => { isDrawing = false; if(spraySound) spraySound.pause(); checkReveal(); });
+            canvas.addEventListener('mouseleave', () => { isDrawing = false; if(spraySound) spraySound.pause(); if(customSprayCursor) customSprayCursor.style.opacity = '0'; });
+            canvas.addEventListener('touchstart', (e) => { if(customSprayCursor) customSprayCursor.style.opacity = '0'; isDrawing = true; if(spraySound) spraySound.play().catch(e=>{}); spray(e); }, {passive: false});
             canvas.addEventListener('touchmove', spray, {passive: false});
-            canvas.addEventListener('touchend', () => { 
-                isDrawing = false; 
-                if(spraySound) spraySound.pause(); // Jeda Suara
-                checkReveal(); 
-            });
+            canvas.addEventListener('touchend', () => { isDrawing = false; if(spraySound) spraySound.pause(); checkReveal(); });
         }
 
-        // Cek progres gosokan
         function checkReveal() {
-            if(scratchCompleted || !ctx) return;
+            if(buttonRevealed || !ctx) return;
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             const pixels = imageData.data;
             let transparent = 0;
-            
             for (let i = 3; i < pixels.length; i += 128) {
                 if (pixels[i] < 128) transparent++;
             }
+            const percentage = (transparent / (pixels.length / 128)) * 100;
             
-            const total = pixels.length / 128;
-            const percentage = (transparent / total) * 100;
-            
-            // 80% area terhapus = selesai
-            if (percentage > 20) {
-                completeSpray();
+            // Ketika mencapai 20%, munculkan tombol Let's Go (tidak otomatis pindah)
+            if (percentage > 20 && !buttonRevealed) {
+                buttonRevealed = true;
+                const instruction = document.getElementById('spray-instruction');
+                if(instruction) instruction.style.opacity = '0';
+                
+                // Tampilkan tombol Let's Go
+                btnLetsGo.classList.remove('opacity-0', 'pointer-events-none');
+                btnLetsGo.classList.add('opacity-100', 'pointer-events-auto');
             }
         }
 
-        // Buka web utama
-        function completeSpray() {
+        // Aksi ketika tombol "LET'S GO!" ditekan
+        btnLetsGo.addEventListener('click', () => {
             scratchCompleted = true;
-            if(spraySound) spraySound.pause(); // Matikan suara total
-            
-            const instruction = document.getElementById('spray-instruction');
-            if(instruction) instruction.style.opacity = '0';
+            if(spraySound) spraySound.pause();
             if(customSprayCursor) customSprayCursor.style.opacity = '0';
-
             if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            setTimeout(() => {
-                if(sprayPage) {
-                    sprayPage.classList.remove('opacity-100');
-                    sprayPage.classList.add('opacity-0');
-                    
-                    setTimeout(() => {
-                        sprayPage.style.display = 'none';
-                        document.body.style.overflow = ''; // Unlock scroll
-                    }, 1000);
-                }
-            }, 1000);
-        }
+            // Inisialisasi Visualizer & Mulai musik
+            initAudioVisualizer();
+            loadTrack(currentTrack);
+            playMusic();
+            musicHud.classList.remove('hidden');
+
+            // Pindah ke Landing Page
+            if(sprayPage) {
+                sprayPage.classList.remove('opacity-100');
+                sprayPage.classList.add('opacity-0');
+                setTimeout(() => {
+                    sprayPage.style.display = 'none';
+                    document.body.style.overflow = ''; // Unlock scroll
+                }, 1000);
+            }
+        });
 
         // --- SCROLL REVEAL ANIMATION (BLUEPRINT PHASES) ---
         document.addEventListener("DOMContentLoaded", function() {
             const revealElements = document.querySelectorAll('.scroll-reveal');
-            
-            const revealOptions = {
-                threshold: 0.15, // Muncul ketika 15% elemen terlihat di layar
-                rootMargin: "0px 0px -50px 0px"
-            };
-
+            const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
             const revealOnScroll = new IntersectionObserver(function(entries, observer) {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.remove('opacity-0', 'translate-y-10');
                         entry.target.classList.add('opacity-100', 'translate-y-0');
-                        observer.unobserve(entry.target); // Hanya animasi 1x
+                        observer.unobserve(entry.target); 
                     }
                 });
             }, revealOptions);
-
-            revealElements.forEach(el => {
-                revealOnScroll.observe(el);
-            });
+            revealElements.forEach(el => revealOnScroll.observe(el));
         });
-
     </script>
 </body>
 </html>
