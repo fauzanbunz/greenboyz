@@ -28,6 +28,7 @@
                         'marquee': 'marquee 25s linear infinite',
                         'marquee-slow': 'marquee 15s linear infinite',
                         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                         'diagonal': 'diagonal 40s linear infinite',
                         'slime': 'slime 3.5s ease-in-out infinite alternate',
                         'slime-slow': 'slime 5s ease-in-out infinite alternate-reverse',
@@ -44,10 +45,6 @@
                         slime: {
                             '0%': { transform: 'scaleY(0.9)' },
                             '100%': { transform: 'scaleY(1.3)' },
-                        },
-                        eq: {
-                            '0%': { height: '4px' },
-                            '100%': { height: '16px' }
                         }
                     }
                 }
@@ -107,23 +104,6 @@
         .marquee-container::-webkit-scrollbar {
             display: none;
         }
-
-        /* Eq Animation Bars */
-        .eq-bar {
-            width: 4px;
-            background-color: #CCFF00;
-            border-radius: 2px;
-            animation: eq 0.5s ease-in-out infinite alternate;
-        }
-        .eq-bar:nth-child(2) { animation-duration: 0.7s; }
-        .eq-bar:nth-child(3) { animation-duration: 0.9s; }
-        .eq-bar:nth-child(4) { animation-duration: 0.6s; }
-        
-        /* Pause animation when music stops */
-        .eq-paused .eq-bar {
-            animation-play-state: paused;
-            height: 4px !important;
-        }
     </style>
 </head>
 <body class="antialiased selection:bg-neon selection:text-black font-sans relative">
@@ -142,10 +122,9 @@
 
     <!-- Spray Page -->
     <div id="spray-page" class="fixed inset-0 z-[90] bg-black hidden flex-col items-center justify-center transition-opacity duration-1000 opacity-100 cursor-none">
-        <!-- Logo Text -->
         <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="absolute w-4/5 md:w-1/2 max-w-2xl opacity-100 pointer-events-none drop-shadow-[0_0_20px_rgba(204,255,0,0.4)]">
         
-        <!-- Let's Go Button (Muncul setelah spray 20%) -->
+        <!-- Let's Go Button -->
         <button id="btn-lets-go" class="opacity-0 pointer-events-none absolute top-[60%] md:top-[65%] z-20 px-10 py-4 border-2 border-neon bg-black/80 text-neon font-bold uppercase tracking-widest hover:bg-neon hover:text-black transition-all duration-500 backdrop-blur-sm shadow-[0_0_20px_rgba(204,255,0,0.3)] hover:shadow-[0_0_30px_rgba(204,255,0,0.6)] cursor-pointer">
             Let's Go!
         </button>
@@ -163,7 +142,6 @@
 
     <!-- Floating Music HUD Player -->
     <div id="music-hud" class="fixed bottom-6 right-6 z-[95] hidden bg-black/40 backdrop-blur-md border border-white/10 p-3 rounded-xl flex items-center gap-4 transition-all hover:bg-black/60 hover:border-neon/50 shadow-lg">
-        <!-- Play/Pause Toggle -->
         <button id="music-toggle" class="text-neon hover:text-white transition-colors focus:outline-none flex-shrink-0">
             <svg id="icon-pause" class="w-6 h-6 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             <svg id="icon-play" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -172,24 +150,19 @@
         <!-- Real-time Audio Visualizer Canvas -->
         <canvas id="music-visualizer" width="40" height="24" class="flex-shrink-0"></canvas>
 
-        <!-- Song Title Marquee -->
         <div class="overflow-hidden w-24 relative flex items-center">
             <div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(90deg, #000 0%, transparent 10%, transparent 90%, #000 100%); mix-blend-mode: multiply;"></div>
-            <p id="music-title" class="text-xs font-mono text-gray-300 whitespace-nowrap animate-marquee-slow">
-                Loading...
-            </p>
+            <p id="music-title" class="text-xs font-mono text-gray-300 whitespace-nowrap animate-marquee-slow">Loading...</p>
         </div>
 
-        <!-- Next Track Button -->
         <button id="music-next" class="text-gray-400 hover:text-neon transition-colors focus:outline-none flex-shrink-0 ml-1">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
         </button>
     </div>
     
-    <!-- Hidden Audio Player for BGM (WAJIB tambah crossorigin="anonymous" untuk Visualizer) -->
     <audio id="bgm-player" preload="metadata" crossorigin="anonymous"></audio>
 
-    <!-- Global Continuous Diagonal Pattern Background -->
+    <!-- Global Background -->
     <div class="fixed inset-0 z-[-5] bg-dark pointer-events-none">
         <div class="absolute inset-0 bg-[url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gblogo.jpg')] bg-repeat animate-diagonal grayscale opacity-[0.08] mix-blend-lighten" style="background-size: 300px 300px;"></div>
     </div>
@@ -212,7 +185,8 @@
                 <a href="#home" class="hover:opacity-50 transition-opacity">HOME</a>
                 <a href="#collection" class="hover:opacity-50 transition-opacity">COLLECTION</a>
                 <a href="#blueprint" class="hover:opacity-50 transition-opacity">BLUEPRINT</a>
-                <a href="whitelist.html" target="_blank" class="hover:opacity-50 transition-opacity">WHITELIST</a>
+                <!-- TAUTAN WHITELIST -->
+                <a href="#wl" class="hover:opacity-50 transition-opacity">WHITELIST</a>
             </div>
             <div class="flex items-center gap-4 md:hidden mt-2">
                 <button class="text-black focus:outline-none hover:opacity-50 transition-opacity" id="mobile-menu-btn">
@@ -221,12 +195,12 @@
             </div>
         </div>
         
-        <!-- Mobile Menu Panel -->
         <div id="mobile-menu" class="hidden md:hidden absolute top-[150px] left-0 w-full bg-neon/95 backdrop-blur-md border-b-4 border-black p-6 flex flex-col space-y-4 shadow-xl z-0">
              <a href="#home" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">HOME</a>
              <a href="#collection" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">COLLECTION</a>
              <a href="#blueprint" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">BLUEPRINT</a>
-             <a href="whitelist.html" target="_blank" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity">WHITELIST</a>
+             <!-- TAUTAN WHITELIST MOBILE -->
+             <a href="#wl" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity">WHITELIST</a>
         </div>
     </nav>
 
@@ -269,8 +243,9 @@
             </p>
 
             <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center scroll-parallax" data-speed="0.8">
-                <a href="whitelist.html" target="_blank" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
-                    Join Allowlist
+                <!-- TAUTAN KE WHITELIST -->
+                <a href="#wl" class="bg-neon text-black px-8 py-4 font-bold uppercase tracking-wide hover:bg-white transition-colors flex items-center justify-center gap-2">
+                    Whitelist
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
                 </a>
                 <a href="#collection" class="bg-transparent border border-gray-600 text-white px-8 py-4 font-bold uppercase tracking-wide hover:border-neon hover:text-neon transition-colors">
@@ -371,7 +346,6 @@
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🧵 Phase I</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Movement</h3>
                         <p class="text-gray-400 text-xs md:text-sm leading-relaxed"><span class="text-white font-bold block mb-1">Culture & Assembly</span>We are not just gathering followers; we are building an underground syndicate. The primary focus of this phase is to unite true collectors, hand-drawn art enthusiasts, and streetwear aficionados into a single ecosystem. No cheap giveaways. Allowlist access is granted strictly to those who genuinely contribute to the GREENBOYZ culture.</p>
-                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">NODE_A // X150:Y50</div>
                     </div>
 
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-100 relative md:absolute md:top-[300px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
@@ -379,7 +353,6 @@
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">💧 Phase II</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Drop</h3>
                         <p class="text-gray-400 text-xs md:text-sm leading-relaxed"><span class="text-white font-bold block mb-1">Genesis Mint</span>The moment street culture meets the blockchain. 1,111 hand-drawn, high-end fashion digital identities officially launch, native to the Robinhood ecosystem. This is your exclusive ticket into the brand. Once the supply is gone, the doors are closed.</p>
-                        <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">NODE_B // X850:Y350</div>
                     </div>
 
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-200 relative md:absolute md:top-[600px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
@@ -387,7 +360,6 @@
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🛠️ Phase III</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Workshop</h3>
                         <p class="text-gray-400 text-xs md:text-sm leading-relaxed"><span class="text-white font-bold block mb-1">Holder Utility & Infrastructure</span>Real, executed utility, not just empty talk. GREENBOYZ holders will gain exclusive access to an independently developed digital ecosystem. This includes a holder-only interactive web portal, custom tools, exclusive community bots, and interactive mini-game experiences. Your NFT is the identity key to unlock these features.</p>
-                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">NODE_C // X150:Y650</div>
                     </div>
 
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-300 relative md:absolute md:top-[900px] md:right-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
@@ -395,7 +367,6 @@
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🥀 Phase IV</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Expansion</h3>
                         <p class="text-gray-400 text-xs md:text-sm leading-relaxed"><span class="text-white font-bold block mb-1">Enter GREENGIRLZ</span>This culture will continue to expand. We will release our second collection: GREENGIRLZ. A visual evolution that broadens our fashion universe. And as the ultimate reward for loyalty: This collection will be strictly FREE to mint for devoted GREENBOYZ holders. Holders eat first.</p>
-                        <div class="absolute bottom-2 left-2 text-[10px] text-gray-600 font-mono">NODE_D // X850:Y950</div>
                     </div>
 
                     <div class="scroll-reveal opacity-0 translate-y-10 transition-all duration-700 ease-out delay-500 relative md:absolute md:top-[1200px] md:left-[5%] md:w-[45%] bg-dark border border-neon/30 p-6 shadow-[4px_4px_0px_0px_#CCFF00] group hover:-translate-y-1 hover:-translate-x-1 hover:shadow-[6px_6px_0px_0px_#CCFF00] z-10">
@@ -403,7 +374,6 @@
                         <h4 class="text-white font-mono text-sm mb-1 uppercase tracking-widest border-b border-white/10 pb-2 mb-3">🌍 Phase V</h4>
                         <h3 class="text-xl md:text-2xl font-bold uppercase mb-2 text-neon">The Metamorphosis</h3>
                         <p class="text-gray-400 text-xs md:text-sm leading-relaxed"><span class="text-white font-bold block mb-1">Beyond the Blockchain</span>The vision is bigger than NFTs. Digital identity is merely the foundation. Where GREENBOYZ goes next—whether that means expanding into high-quality physical merch, a more complex gaming ecosystem, retail invasion, or evolving into a fully-fledged global lifestyle brand—all depends on what we build and earn together along this journey. We build, we earn, we scale.</p>
-                        <div class="absolute bottom-2 right-2 text-[10px] text-gray-600 font-mono">NODE_E // X150:Y1250</div>
                     </div>
 
                     <div class="hidden md:block w-full h-[1450px] pointer-events-none"></div>
@@ -412,17 +382,83 @@
         </div>
     </section>
 
-    <section id="wl" class="py-24 px-6 md:px-12 bg-neon text-black clip-path-slant relative -mb-10 pt-32 pb-40 z-20">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-5xl md:text-7xl font-aerosoldier font-normal uppercase tracking-tighter mb-6">Join <br>GREENBOYZ</h2>
-            <p class="font-medium max-w-xl mx-auto mb-10">Allowlist spots are limited and hand-picked. Apply for the Genesis Mint.</p>
-            <a href="whitelist.html" target="_blank" class="inline-block bg-transparent border-2 border-black text-black px-12 py-4 font-bold uppercase tracking-widest hover:bg-black hover:text-neon transition-colors mt-4">
-                Submit Application
-            </a>
+    <!-- INTEGRATED WHITELIST SECTION (BAGIAN FORM BERADA DI SINI) -->
+    <section id="wl" class="py-24 px-6 md:px-12 bg-neon text-black clip-path-slant relative pt-32 pb-40 z-20">
+        <div class="max-w-4xl mx-auto">
+            
+            <div class="bg-black text-white border-4 border-black p-8 md:p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative">
+                
+                <div class="text-center mb-10">
+                    <h1 class="font-aerosoldier text-5xl md:text-7xl text-neon mb-4 tracking-tighter uppercase">Welcome to the <span class="text-white">Park</span></h1>
+                    <p class="text-gray-400 text-sm md:text-base leading-relaxed max-w-xl mx-auto">
+                        We are granting early Allowlist (WL) access to the loyal ones.<br>To secure your spot, complete the protocol below:
+                    </p>
+                </div>
+
+                <form id="wl-form" action="https://script.google.com/macros/s/AKfycbwsWJGWKDOGGB1IT1_Oma3YQqfrhBxnFFLCz-pjoEDxPY1E4dBK5w7A3Dy6vD19LqVe/exec" method="POST" class="space-y-8">
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-neon font-bold uppercase tracking-widest text-sm mb-4">// TRANSMISSION TASKS</h3>
+                        
+                        <!-- Task 1 -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border border-white/10 bg-graydark">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-white text-black font-bold flex items-center justify-center text-xs">1</div>
+                                <span class="text-white font-mono text-sm uppercase">Follow @greenboyz_art</span>
+                            </div>
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <a href="https://x.com/greenboyz_art" target="_blank" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <button type="button" id="btn-v1" onclick="verifyTask(1)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
+                            </div>
+                        </div>
+
+                        <!-- Task 2 -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border border-white/10 bg-graydark">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-white text-black font-bold flex items-center justify-center text-xs">2</div>
+                                <span class="text-white font-mono text-sm uppercase">Like & RT this transmission</span>
+                            </div>
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <a href="#" target="_blank" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <button type="button" id="btn-v2" onclick="verifyTask(2)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
+                            </div>
+                        </div>
+
+                        <!-- Task 3 -->
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 border border-white/10 bg-graydark">
+                            <div class="flex items-center gap-3">
+                                <div class="w-6 h-6 bg-white text-black font-bold flex items-center justify-center text-xs">3</div>
+                                <span class="text-white font-mono text-sm uppercase leading-tight">Reply with tag 2 friends to skate 🛹</span>
+                            </div>
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <a href="#" target="_blank" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <button type="button" id="btn-v3" onclick="verifyTask(3)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 pt-4 border-t border-white/10">
+                        <h3 class="text-neon font-bold uppercase tracking-widest text-sm mb-4">// SUBMIT DETAILS</h3>
+                        <div>
+                            <input type="text" name="twitter" placeholder="FILL TWITTER NAME (@...)" class="w-full bg-black border border-white/20 p-4 text-white font-mono uppercase focus:border-neon focus:outline-none focus:ring-1 focus:ring-neon transition-colors placeholder:text-gray-600" required>
+                        </div>
+                        <div>
+                            <input type="text" name="wallet" placeholder="SUBMIT EVM WALLET (0x...)" class="w-full bg-black border border-white/20 p-4 text-white font-mono focus:border-neon focus:outline-none focus:ring-1 focus:ring-neon transition-colors placeholder:text-gray-600" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-submit" class="w-full bg-neon text-black font-aerosoldier text-3xl md:text-4xl py-4 mt-6 hover:bg-white transition-colors tracking-widest uppercase">
+                        Submit Data
+                    </button>
+                    
+                    <p id="error-msg" class="text-red-500 font-mono text-xs text-center mt-2 hidden">Please VERIFY all tasks first before submitting.</p>
+                </form>
+            </div>
+            
         </div>
     </section>
 
-    <footer class="bg-black pt-24 pb-8 px-6 md:px-12 border-t border-white/10 relative z-10">
+    <footer class="bg-black pt-24 pb-8 px-6 md:px-12 relative z-10">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
             <a href="#" class="flex items-center gap-2">
                 <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/gb%20logo%20text.svg" alt="GREENBOYZ" class="h-6 md:h-8">
@@ -435,9 +471,19 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto mt-8 text-center md:text-left text-gray-700 text-xs font-mono">
-            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED.
+            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED. NOT FINANCIAL ADVICE.
         </div>
     </footer>
+
+    <!-- POP UP SECURED (MUNCUL SETELAH SUBMIT) -->
+    <div id="popup-secured" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
+        <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/ChatGPT%20Image%2011%20Jul%202026%2C%2014.19.44.png" alt="Secured Artwork" class="w-64 md:w-80 h-auto border-4 border-neon mb-8 shadow-[0_0_50px_rgba(204,255,0,0.4)]">
+        <h2 class="font-aerosoldier text-7xl md:text-9xl text-neon mb-2 animate-pulse-fast tracking-tighter drop-shadow-[0_0_20px_rgba(204,255,0,0.8)]">SECURED</h2>
+        <p class="text-white font-mono text-lg tracking-widest mb-10 text-center uppercase">You are on the list.</p>
+        <button onclick="document.getElementById('popup-secured').classList.replace('flex', 'hidden');" class="px-8 py-4 border-2 border-white text-white font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
+            Return to Protocol
+        </button>
+    </div>
 
     <script>
         // --- MOBILE MENU ---
@@ -460,17 +506,16 @@
             });
         });
 
-        // --- SCROLL PARALLAX EFFECT ---
         window.addEventListener('scroll', () => {
             let scroll = window.scrollY;
 
-            // Efek Parallax untuk Teks
+            // Parallax Teks
             document.querySelectorAll('.scroll-parallax').forEach(el => {
                 let speed = el.getAttribute('data-speed');
                 el.style.transform = `translateY(${scroll * speed}px)`;
             });
 
-            // Efek Parallax untuk Papan Skate yang Menjauh/Membuka
+            // Parallax Papan Skate (Menjauh)
             const heroImgLeft = document.getElementById('hero-img-left');
             const heroImgRight = document.getElementById('hero-img-right');
             const collectionSection = document.getElementById('collection');
@@ -479,21 +524,17 @@
                 let collectionTop = collectionSection.offsetTop;
                 let ratio = scroll / collectionTop;
                 
-                // Membatasi pergerakan agar berhenti saat mencapai bagian Collection
                 if (ratio < 0) ratio = 0;
                 if (ratio > 1) ratio = 1;
 
                 heroImgLeft.style.transform = `translate(${-50 - (ratio * 100)}%, -50%)`;
                 heroImgRight.style.transform = `translate(${50 + (ratio * 100)}%, -50%)`;
-                
-                // Menurunkan Opacity agar semakin transparan saat menjauh
                 heroImgLeft.style.opacity = 1 - ratio;
                 heroImgRight.style.opacity = 1 - ratio;
             }
         });
 
-        // --- MUSIC HUD LOGIC & REAL-TIME VISUALIZER ---
-        // Daftar lagu terbaru dari GitHub
+        // --- MUSIC HUD LOGIC & VISUALIZER ---
         const playlist = [
             { title: "We Are Green.mp3", url: "https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/we%20are%20green.mp3" },
             { title: "Riot.mp3", url: "https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/riot.mp3" },
@@ -510,18 +551,17 @@
         const iconPause = document.getElementById('icon-pause');
         const musicTitle = document.getElementById('music-title');
 
-        // Web Audio API Variables for Visualizer
         let audioCtx, analyser, dataArray, audioSource;
         const visCanvas = document.getElementById('music-visualizer');
         const visCtx = visCanvas ? visCanvas.getContext('2d') : null;
 
         function initAudioVisualizer() {
-            if (audioCtx) return; // Mencegah inisialisasi ganda
+            if (audioCtx) return; 
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64; // Ukuran sample kecil (hanya butuh sedikit titik)
+                analyser.fftSize = 64; 
                 
                 const bufferLength = analyser.frequencyBinCount;
                 dataArray = new Uint8Array(bufferLength);
@@ -532,7 +572,7 @@
                 
                 drawVisualizer();
             } catch (e) {
-                console.log("Web Audio API tidak didukung atau diblokir:", e);
+                console.log("Audio API blocked:", e);
             }
         }
 
@@ -541,10 +581,9 @@
             requestAnimationFrame(drawVisualizer);
 
             visCtx.clearRect(0, 0, visCanvas.width, visCanvas.height);
-            visCtx.fillStyle = '#CCFF00'; // Warna Neon Green
+            visCtx.fillStyle = '#CCFF00'; 
 
             if(bgmPlayer.paused) {
-                // Jika pause, gambar 4 titik diam di bawah
                 for(let i=0; i<4; i++) {
                     visCtx.beginPath();
                     visCtx.arc(5 + (i * 10), visCanvas.height - 3, 2.5, 0, Math.PI*2);
@@ -553,15 +592,11 @@
                 return;
             }
 
-            // Ambil data frekuensi musik secara real-time
             analyser.getByteFrequencyData(dataArray);
-
-            // Pilih 4 index frekuensi yang berbeda (Bass, Low-Mid, Mid, High)
             const bins = [2, 6, 12, 18]; 
 
             for(let i=0; i<4; i++) {
                 const freqValue = dataArray[bins[i]] || 0;
-                // Hitung tinggi pantulan titik (0 - 255 dikonversi ke skala canvas)
                 const percent = freqValue / 255;
                 const maxBounce = visCanvas.height - 6; 
                 const y = (visCanvas.height - 3) - (percent * maxBounce);
@@ -579,13 +614,11 @@
         }
 
         function playMusic() {
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             bgmPlayer.play().then(() => {
                 iconPlay.classList.add('hidden');
                 iconPause.classList.remove('hidden');
-            }).catch(e => console.log("Audio autplay blocked by browser."));
+            }).catch(e => console.log("Blocked:", e));
         }
 
         function pauseMusic() {
@@ -605,14 +638,13 @@
             playMusic();
         });
 
-        // Auto next track
         bgmPlayer.addEventListener('ended', () => {
             currentTrack = (currentTrack + 1) % playlist.length;
             loadTrack(currentTrack);
             playMusic();
         });
 
-        // --- SPRAY LOGIC & LET'S GO BUTTON ---
+        // --- SPRAY LOGIC ---
         document.body.style.overflow = 'hidden'; 
         const loader = document.getElementById('loader');
         const btnLetsSkate = document.getElementById('btn-lets-skate');
@@ -717,43 +749,38 @@
             }
             const percentage = (transparent / (pixels.length / 128)) * 100;
             
-            // Ketika mencapai 20%, munculkan tombol Let's Go (tidak otomatis pindah)
             if (percentage > 20 && !buttonRevealed) {
                 buttonRevealed = true;
                 const instruction = document.getElementById('spray-instruction');
                 if(instruction) instruction.style.opacity = '0';
                 
-                // Tampilkan tombol Let's Go
                 btnLetsGo.classList.remove('opacity-0', 'pointer-events-none');
                 btnLetsGo.classList.add('opacity-100', 'pointer-events-auto');
             }
         }
 
-        // Aksi ketika tombol "LET'S GO!" ditekan
         btnLetsGo.addEventListener('click', () => {
             scratchCompleted = true;
             if(spraySound) spraySound.pause();
             if(customSprayCursor) customSprayCursor.style.opacity = '0';
             if(ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Inisialisasi Visualizer & Mulai musik
             initAudioVisualizer();
             loadTrack(currentTrack);
             playMusic();
             musicHud.classList.remove('hidden');
 
-            // Pindah ke Landing Page
             if(sprayPage) {
                 sprayPage.classList.remove('opacity-100');
                 sprayPage.classList.add('opacity-0');
                 setTimeout(() => {
                     sprayPage.style.display = 'none';
-                    document.body.style.overflow = ''; // Unlock scroll
+                    document.body.style.overflow = ''; 
                 }, 1000);
             }
         });
 
-        // --- SCROLL REVEAL ANIMATION (BLUEPRINT PHASES) ---
+        // --- SCROLL REVEAL (BLUEPRINT) ---
         document.addEventListener("DOMContentLoaded", function() {
             const revealElements = document.querySelectorAll('.scroll-reveal');
             const revealOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
@@ -767,6 +794,56 @@
                 });
             }, revealOptions);
             revealElements.forEach(el => revealOnScroll.observe(el));
+        });
+
+        // --- WHITELIST FORM LOGIC ---
+        let wlTasks = { 1: false, 2: false, 3: false };
+
+        function verifyTask(num) {
+            const btn = document.getElementById('btn-v' + num);
+            btn.innerText = 'VERIFIED ✓';
+            btn.classList.remove('border-neon', 'text-neon');
+            btn.classList.add('bg-neon', 'text-black');
+            btn.disabled = true; 
+            wlTasks[num] = true;
+            document.getElementById('error-msg').classList.add('hidden');
+        }
+
+        const form = document.getElementById('wl-form');
+        const submitBtn = document.getElementById('btn-submit');
+        const errorMsg = document.getElementById('error-msg');
+        const popupSecured = document.getElementById('popup-secured');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); 
+
+            if(!wlTasks[1] || !wlTasks[2] || !wlTasks[3]) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            submitBtn.innerText = "SENDING...";
+            submitBtn.disabled = true;
+            submitBtn.classList.replace('bg-neon', 'bg-gray-500');
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            })
+            .then(() => {
+                popupSecured.classList.remove('hidden');
+                popupSecured.classList.add('flex');
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert("Transmission failed. Please check your connection and try again.");
+                submitBtn.innerText = "SUBMIT DATA";
+                submitBtn.disabled = false;
+                submitBtn.classList.replace('bg-gray-500', 'bg-neon');
+            });
         });
     </script>
 </body>
