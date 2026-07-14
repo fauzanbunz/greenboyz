@@ -45,6 +45,10 @@
                         slime: {
                             '0%': { transform: 'scaleY(0.9)' },
                             '100%': { transform: 'scaleY(1.3)' },
+                        },
+                        eq: {
+                            '0%': { height: '4px' },
+                            '100%': { height: '16px' }
                         }
                     }
                 }
@@ -185,7 +189,6 @@
                 <a href="#home" class="hover:opacity-50 transition-opacity">HOME</a>
                 <a href="#collection" class="hover:opacity-50 transition-opacity">COLLECTION</a>
                 <a href="#blueprint" class="hover:opacity-50 transition-opacity">BLUEPRINT</a>
-                <!-- TAUTAN WHITELIST -->
                 <a href="#wl" class="hover:opacity-50 transition-opacity">WHITELIST</a>
             </div>
             <div class="flex items-center gap-4 md:hidden mt-2">
@@ -199,7 +202,6 @@
              <a href="#home" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">HOME</a>
              <a href="#collection" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">COLLECTION</a>
              <a href="#blueprint" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity border-b border-black/10 pb-2">BLUEPRINT</a>
-             <!-- TAUTAN WHITELIST MOBILE -->
              <a href="#wl" class="text-black font-extrabold uppercase hover:opacity-50 transition-opacity">WHITELIST</a>
         </div>
     </nav>
@@ -397,6 +399,9 @@
 
                 <form id="wl-form" action="https://script.google.com/macros/s/AKfycbwsWJGWKDOGGB1IT1_Oma3YQqfrhBxnFFLCz-pjoEDxPY1E4dBK5w7A3Dy6vD19LqVe/exec" method="POST" class="space-y-8">
                     
+                    <!-- Honeypot untuk menangkap BOT Spam (User asli tidak akan melihat field ini) -->
+                    <input type="text" name="bot_check" id="bot_check" tabindex="-1" autocomplete="off" style="display:none;">
+
                     <div class="space-y-4">
                         <h3 class="text-neon font-bold uppercase tracking-widest text-sm mb-4">// TRANSMISSION TASKS</h3>
                         
@@ -407,7 +412,7 @@
                                 <span class="text-white font-mono text-sm uppercase">Follow @greenboyz_art</span>
                             </div>
                             <div class="flex gap-2 w-full md:w-auto">
-                                <a href="https://x.com/greenboyz_art" target="_blank" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <a href="https://x.com/greenboyz_art" target="_blank" onclick="markTaskClicked(1)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
                                 <button type="button" id="btn-v1" onclick="verifyTask(1)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
                             </div>
                         </div>
@@ -419,7 +424,7 @@
                                 <span class="text-white font-mono text-sm uppercase">Like & RT this transmission</span>
                             </div>
                             <div class="flex gap-2 w-full md:w-auto">
-                                <a href="#" target="_blank" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <a href="#" target="_blank" onclick="markTaskClicked(2)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
                                 <button type="button" id="btn-v2" onclick="verifyTask(2)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
                             </div>
                         </div>
@@ -431,7 +436,7 @@
                                 <span class="text-white font-mono text-sm uppercase leading-tight">Reply with tag 2 friends to skate 🛹</span>
                             </div>
                             <div class="flex gap-2 w-full md:w-auto">
-                                <a href="#" target="_blank" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <a href="#" target="_blank" onclick="markTaskClicked(3)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
                                 <button type="button" id="btn-v3" onclick="verifyTask(3)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
                             </div>
                         </div>
@@ -444,6 +449,7 @@
                         </div>
                         <div>
                             <input type="text" name="wallet" placeholder="SUBMIT EVM WALLET (0x...)" class="w-full bg-black border border-white/20 p-4 text-white font-mono focus:border-neon focus:outline-none focus:ring-1 focus:ring-neon transition-colors placeholder:text-gray-600" required>
+                            <p class="text-gray-500 text-xs mt-2 italic font-mono">* Ensure this is an active ERC-20 / EVM address.</p>
                         </div>
                     </div>
 
@@ -796,10 +802,22 @@
             revealElements.forEach(el => revealOnScroll.observe(el));
         });
 
-        // --- WHITELIST FORM LOGIC ---
+        // --- WHITELIST FORM LOGIC & SECURITY ---
         let wlTasks = { 1: false, 2: false, 3: false };
+        let clickedTasks = { 1: false, 2: false, 3: false }; // Melacak klik "GO TO X"
+
+        // Dipanggil saat tombol GO TO X ditekan
+        function markTaskClicked(num) {
+            clickedTasks[num] = true;
+        }
 
         function verifyTask(num) {
+            // Mencegah klik verify jika tombol GO TO X belum diklik
+            if (!clickedTasks[num]) {
+                alert("PROTOCOL ERROR: You must click 'GO TO X' first to complete this task!");
+                return;
+            }
+
             const btn = document.getElementById('btn-v' + num);
             btn.innerText = 'VERIFIED ✓';
             btn.classList.remove('border-neon', 'text-neon');
@@ -817,11 +835,32 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault(); 
 
+            // 1. Cek Honeypot (Jika Bot mengisi input tersembunyi, gagalkan diam-diam)
+            if (document.getElementById('bot_check').value !== "") {
+                console.warn("Bot detected.");
+                return; 
+            }
+
+            // 2. Cek LocalStorage (Mencegah double submit dari device/browser yang sama)
+            if (localStorage.getItem('greenboyz_wl_submitted') === 'true') {
+                alert("DENIED: You have already secured a spot from this device. Multiple entries are restricted.");
+                return;
+            }
+
+            // 3. Pastikan semua task sudah diverifikasi
             if(!wlTasks[1] || !wlTasks[2] || !wlTasks[3]) {
                 errorMsg.classList.remove('hidden');
                 return;
             }
 
+            // 4. Validasi Format Wallet EVM menggunakan pola RegEx standar
+            const walletVal = document.querySelector('input[name="wallet"]').value.trim();
+            if (!/^0x[a-fA-F0-9]{40}$/.test(walletVal)) {
+                alert("INVALID FORMAT: Please enter a valid EVM Wallet Address (must start with '0x' followed by 40 characters).");
+                return;
+            }
+
+            // Mulai Proses Pengiriman
             submitBtn.innerText = "SENDING...";
             submitBtn.disabled = true;
             submitBtn.classList.replace('bg-neon', 'bg-gray-500');
@@ -834,6 +873,9 @@
                 mode: 'no-cors'
             })
             .then(() => {
+                // Simpan rekam jejak di perangkat agar tidak bisa diulang
+                localStorage.setItem('greenboyz_wl_submitted', 'true');
+                
                 popupSecured.classList.remove('hidden');
                 popupSecured.classList.add('flex');
             })
