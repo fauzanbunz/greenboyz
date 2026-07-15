@@ -971,19 +971,27 @@
         // 3. Delay singkat agar browser selesai reflow/paint sebelum di-capture
         await new Promise((resolve) => setTimeout(resolve, 300));
 
-        // 4. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
+        // 4. FIX PENTING: html2canvas punya bug terkenal saat meng-capture elemen
+        //    "position: fixed" (seperti popup tiket ini) kalau halaman utama sempat
+        //    di-scroll sebelumnya. Akibatnya hasil capture jadi kepotong/geser acak.
+        //    Solusinya: paksa halaman ke posisi paling atas, lalu kompensasi offset
+        //    scroll ke html2canvas lewat scrollX/scrollY.
+        window.scrollTo(0, 0);
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+
+        // 5. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
         //    supaya hasil download identik dengan yang tampil di popup.
         const canvas = await html2canvas(posterElement, {
             useCORS: true,
             allowTaint: false,
-            scale: Math.max(window.devicePixelRatio || 1, 2) * 2, // resolusi HD, ikut layar device
+            scale: 2, // resolusi HD yang aman & konsisten di semua device
             backgroundColor: null,
             logging: false,
             imageTimeout: 15000,
+            scrollX: -window.scrollX,
+            scrollY: -window.scrollY,
             width: posterElement.offsetWidth,
-            height: posterElement.offsetHeight,
-            windowWidth: posterElement.scrollWidth,
-            windowHeight: posterElement.scrollHeight
+            height: posterElement.offsetHeight
         });
 
         const link = document.createElement('a');
