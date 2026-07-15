@@ -870,7 +870,12 @@
 
             const walletVal = document.querySelector('input[name="wallet"]').value.trim();
             if (!/^0x[a-fA-F0-9]{40}$/.test(walletVal)) {
-                alert("INVALID FORMAT: Please enter a valid EVM Wallet Address (must start with '0x' followed by 40 characters).");
+                // Diubah agar tidak menggunakan alert() sesuai aturan
+                const msg = document.createElement('div');
+                msg.className = 'fixed top-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-3 font-mono text-sm z-[200] border-2 border-black shadow-[4px_4px_0px_0px_#000]';
+                msg.innerText = "INVALID FORMAT: EVM Wallet must start with '0x' and be 42 characters long.";
+                document.body.appendChild(msg);
+                setTimeout(() => msg.remove(), 4000);
                 return;
             }
 
@@ -879,28 +884,63 @@
             submitBtn.classList.replace('bg-neon', 'bg-gray-500');
 
             const formData = new FormData(form);
+            
+            // PERUBAHAN PENTING: Konversi FormData menjadi URLSearchParams
+            // Ini adalah cara paling andal untuk mengirim data ke Google Web App
+            // menghindari masalah CORS dan 'opaque responses'
+            const data = new URLSearchParams();
+            for (const pair of formData) {
+                data.append(pair[0], pair[1]);
+            }
 
             fetch(form.action, {
                 method: 'POST',
-                body: formData,
-                mode: 'no-cors'
+                // Kirim sebagai URL-encoded
+                body: data, 
             })
-            .then(() => {
+            .then(response => {
+                // Memastikan respons sukses secara HTTP (status 200-299)
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Anda bisa mencoba .text() jika sheet merespons dengan string
+                return response.text(); 
+            })
+            .then((result) => {
+                console.log("Success:", result);
+                
                 const inputTwitter = document.querySelector('input[name="twitter"]').value.trim();
                 const inputWallet = document.querySelector('input[name="wallet"]').value.trim();
-                
-                document.getElementById('p-twitter').innerText = inputTwitter;
-                document.getElementById('p-wallet').innerText = inputWallet.substring(0, 6) + '...' + inputWallet.substring(inputWallet.length - 4);
-                
                 const memberNum = Math.floor(Math.random() * 1111) + 1;
-                document.getElementById('p-member').innerText = '# ' + memberNum.toString().padStart(4, '0');
+                
+                // Simpan data untuk dirender ke canvas
+                ticketData = {
+                    member: '# ' + memberNum.toString().padStart(4, '0'),
+                    twitter: inputTwitter,
+                    wallet: inputWallet.substring(0, 6) + '...' + inputWallet.substring(inputWallet.length - 4)
+                };
+
+                // Render gambar ke canvas
+                renderTicketToCanvas();
 
                 popupSecured.classList.remove('hidden');
                 popupSecured.classList.add('flex');
+                
+                // Reset tombol submit jika user menutup popup
+                submitBtn.innerText = "SUBMIT DATA";
+                submitBtn.disabled = false;
+                submitBtn.classList.replace('bg-gray-500', 'bg-neon');
             })
             .catch(error => {
-                console.error('Error!', error.message);
-                alert("Transmission failed. Please check your connection and try again.");
+                console.error('Fetch Error:', error);
+                
+                // Mengganti alert dengan elemen UI yang lebih baik
+                const errBox = document.createElement('div');
+                errBox.className = 'fixed top-10 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-3 font-mono text-sm z-[200] border-2 border-black shadow-[4px_4px_0px_0px_#000]';
+                errBox.innerText = "Transmission failed. Check network or Script deployment.";
+                document.body.appendChild(errBox);
+                setTimeout(() => errBox.remove(), 5000);
+
                 submitBtn.innerText = "SUBMIT DATA";
                 submitBtn.disabled = false;
                 submitBtn.classList.replace('bg-gray-500', 'bg-neon');
@@ -945,19 +985,27 @@
                 // Menggunakan Monospace bawaan sistem, tebal
                 ctx.font = 'bold ' + (canvas.height * 0.08) + 'px monospace'; 
                 const idX = canvas.width * 0.13;
-                const idY = canvas.height * 0.54; // Koordinat Y untuk PASS ID
+                // Ubah nilai pengali di bawah ini untuk menggeser PASS ID ke atas/bawah
+                // Nilai lebih kecil (misal 0.50) = geser ke atas.
+                const idY = canvas.height * 0.52; 
                 ctx.fillText(ticketData.member, idX, idY);
 
                 // B. Render Twitter
                 ctx.font = 'bold ' + (canvas.height * 0.05) + 'px monospace'; 
                 const twX = canvas.width * 0.13;
-                const twY = canvas.height * 0.64; // Koordinat Y untuk Twitter
+                // Ubah nilai pengali di bawah ini untuk menggeser teks Twitter ke atas/bawah
+                // Di gambar Anda, teks ini perlu NAIK sedikit.
+                // Coba turunkan nilainya, misalnya dari 0.69 menjadi 0.66 atau 0.67
+                const twY = canvas.height * 0.67; 
                 ctx.fillText(ticketData.twitter, twX, twY);
 
                 // C. Render Wallet
                 ctx.font = 'bold ' + (canvas.height * 0.045) + 'px monospace'; 
                 const wlX = canvas.width * 0.13;
-                const wlY = canvas.height * 0.74; // Koordinat Y untuk Wallet
+                // Ubah nilai pengali di bawah ini untuk menggeser teks Wallet ke atas/bawah
+                // Di gambar Anda, teks ini perlu NAIK sedikit agar tidak memotong garis bawah
+                // Coba turunkan nilainya, misalnya dari 0.81 menjadi 0.77 atau 0.78
+                const wlY = canvas.height * 0.78; 
                 ctx.fillText(ticketData.wallet, wlX, wlY);
             };
             bgImg.src = TICKET_BG_URL;
