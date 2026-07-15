@@ -521,7 +521,7 @@
                 </div>
                 
                 <!-- Alamat Wallet EVM - Diposisikan di bawah tulisan WALLET -->
-                <div class="absolute top-[70%] left-[10%] md:left-[12%] w-[50%]">
+                <div class="absolute top-[80%] left-[10%] md:left-[12%] w-[50%]">
                     <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">0x...</span>
                 </div>
 
@@ -966,30 +966,46 @@
         function savePoster() {
             const btnSave = document.getElementById('btn-save');
             btnSave.innerText = "SAVING...";
-            
-            const posterElement = document.getElementById('poster-capture');
-            
-            // Konfigurasi untuk meningkatkan resolusi agar tidak buram
-            html2canvas(posterElement, {
-                useCORS: true, 
-                allowTaint: true,
-                scale: 3,           // Menaikkan resolusi 3x lipat agar tajam
-                logging: false,
-                backgroundColor: null 
-            }).then(canvas => {
+
+            // 1. Ambil data dari input form
+            const id = document.getElementById('p-member').innerText;
+            const twitter = document.getElementById('p-twitter').innerText;
+            const wallet = document.getElementById('p-wallet').innerText;
+
+            // 2. Buat Canvas baru dengan ukuran asli gambar (1402 x 1122)
+            const canvas = document.createElement('canvas');
+            canvas.width = 1402;
+            canvas.height = 1122;
+            const ctx = canvas.getContext('2d');
+
+            // 3. Load gambar asli dari GitHub
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = 'https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png';
+
+            img.onload = function() {
+                // Gambar latar belakang
+                ctx.drawImage(img, 0, 0, 1402, 1122);
+
+                // Pengaturan Font (Menggunakan font sistem yang mendekati atau font yang dimuat)
+                ctx.fillStyle = "black";
+                ctx.font = "bold 60px sans-serif"; // Sesuaikan ukuran font
+
+                // 4. Gambar teks di atas gambar (Koordinat disesuaikan dengan 1402x1122)
+                // (Anda bisa menyesuaikan angka ini agar pas dengan garis di gambar)
+                ctx.fillText(id, 250, 260);      // Koordinat ID
+                ctx.fillText(twitter, 250, 430); // Koordinat Twitter
+                ctx.fillText(wallet, 250, 680);  // Koordinat Wallet
+
+                // 5. Unduh
                 const link = document.createElement('a');
-                link.download = 'GREENBOYZ_WL_PASS.png';
-                // Kualitas 1.0 = 100% (tidak dikompres)
-                link.href = canvas.toDataURL('image/png', 1.0); 
+                link.download = 'GREENBOYZ_WHITELIST_PASS.png';
+                link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
-                
+
                 btnSave.innerText = "SAVED ✓";
                 setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
-            }).catch(err => {
-                console.error(err);
-                alert("Failed to save poster. Please take a manual screenshot.");
-                btnSave.innerText = "SAVE POSTER";
-            });
+            };
         }
 
         function resetProtocol() {
