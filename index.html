@@ -491,7 +491,16 @@
         </button>
 
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden bg-cover bg-center" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
+        <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden" style="background-color:#000;">
+    <!-- FIX: Gunakan <img> agar html2canvas bisa render background dengan benar -->
+    <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png"
+         crossorigin="anonymous"
+         alt="WL Pass Background"
+         class="absolute inset-0 w-full h-full object-cover object-center"
+         id="poster-bg-img">
+    <!-- ...elemen teks lain tetap seperti semula... -->
+</div>
+
             
             <!-- Data Teks menggunakan Font Brick, Kapital, dan diposisikan secara presisi absolut -->
             <div class="absolute inset-0 font-brick uppercase text-black">
@@ -933,81 +942,54 @@
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
-        async function savePoster() {
+       async function savePoster() {
     const btnSave = document.getElementById('btn-save');
     const posterElement = document.getElementById('poster-capture');
+    const bgImg = document.getElementById('poster-bg-img');
 
-    if (!posterElement) {
-        console.error("Elemen 'poster-capture' tidak ditemukan.");
+    if (!posterElement || !bgImg) {
+        alert("Elemen poster tidak ditemukan.");
         return;
     }
 
     btnSave.innerText = "PROCESSING...";
     btnSave.disabled = true;
 
-    try {
-        if (document.fonts && document.fonts.ready) {
-            await document.fonts.ready;
-        }
+    // Pastikan gambar background sudah load
+    if (!bgImg.complete) {
+        await new Promise(resolve => { bgImg.onload = resolve; bgImg.onerror = resolve; });
+    }
 
-        const bgImageUrl = getComputedStyle(posterElement).backgroundImage
-            .replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
-        if (bgImageUrl && bgImageUrl !== 'none') {
-            await new Promise((resolve) => {
-                const preload = new Image();
-                preload.crossOrigin = 'anonymous';
-                preload.onload = resolve;
-                preload.onerror = resolve;
-                preload.src = bgImageUrl;
-            });
-        }
+    // Tunggu 2 frame agar DOM benar-benar siap
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => requestAnimationFrame(r));
 
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        window.scrollTo(0, 0);
-        await new Promise((resolve) => requestAnimationFrame(resolve));
+    // Scale minimal 3x untuk hasil tajam
+    const scale = Math.max(window.devicePixelRatio || 1, 3);
 
-        // Gunakan devicePixelRatio untuk scale agar hasil optimal di semua device
-        const scale = window.devicePixelRatio > 1 ? window.devicePixelRatio : 3;
+    const canvas = await html2canvas(posterElement, {
+        useCORS: true,
+        allowTaint: false,
+        scale: scale,
+        backgroundColor: '#000000',
+        imageTimeout: 20000,
+        foreignObjectRendering: false,
+        logging: false
+    });
 
-        // Capture dengan scale tinggi
-        const canvas = await html2canvas(posterElement, {
-            useCORS: true,
-            allowTaint: false,
-            scale: scale,
-            backgroundColor: null,
-            logging: false,
-            imageTimeout: 15000,
-            scrollX: -window.scrollX,
-            scrollY: -window.scrollY,
-            width: posterElement.offsetWidth,
-            height: posterElement.offsetHeight
-        });
+    // Langsung gunakan hasil canvas dari html2canvas
+    const link = document.createElement('a');
+    link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+    link.href = canvas.toDataURL('image/png', 1.0);
+    link.click();
 
-        // Nonaktifkan image smoothing agar hasil lebih tajam
-        const finalCanvas = document.createElement('canvas');
-        finalCanvas.width = canvas.width;
-        finalCanvas.height = canvas.height;
-        const ctx = finalCanvas.getContext('2d');
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(canvas, 0, 0);
-
-        const link = document.createElement('a');
-        link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-        link.href = finalCanvas.toDataURL('image/png', 1.0);
-        link.click();
-
-        btnSave.innerText = "SAVED ✓";
-        setTimeout(() => {
-            btnSave.innerText = "SAVE POSTER";
-            btnSave.disabled = false;
-        }, 2000);
-    } catch (err) {
-        console.error("Error html2canvas:", err);
-        alert("Gagal menyimpan gambar. Pastikan koneksi internet stabil.");
+    btnSave.innerText = "SAVED ✓";
+    setTimeout(() => {
         btnSave.innerText = "SAVE POSTER";
         btnSave.disabled = false;
-    }
+    }, 2000);
 }
+
 
         function resetProtocol() {
             window.location.reload();
