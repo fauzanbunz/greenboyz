@@ -486,28 +486,26 @@
     <div id="popup-secured" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <div id="poster-capture" class="relative w-[300px] md:w-[380px] h-[400px] md:h-[500px] border-[6px] border-[#CCFF00] bg-cover bg-center shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0 overflow-hidden" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
+        <!-- Aspek rasio dan styling container disesuaikan agar gambar tidak terpotong -->
+        <div id="poster-capture" class="relative w-[300px] md:w-[380px] aspect-[3/4] border-[6px] border-[#CCFF00] bg-cover bg-center shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
             
-            <!-- Teks Dinamis di atas desain tiket -->
-            <!-- Rotasi dihilangkan karena desain tiket tampak lurus mendatar -->
-            <div class="absolute inset-0 flex flex-col pt-[35%] px-[15%] font-window text-black">
+            <!-- Pembungkus data dengan font Aerosoldier, huruf kapital semua -->
+            <div class="absolute inset-0 font-aerosoldier uppercase text-black">
                 
                 <!-- PASS ID -->
-                <div class="mb-4">
-                    <span class="block text-sm md:text-base opacity-70 tracking-widest">PASS ID</span>
-                    <span id="p-member" class="block text-4xl md:text-5xl tracking-widest leading-none"># 0000</span>
+                <!-- Posisikan secara absolut berdasarkan gambar -->
+                <div class="absolute top-[28%] left-[8%] md:left-[10%]">
+                    <span id="p-member" class="text-3xl md:text-4xl tracking-widest drop-shadow-md"># 0000</span>
                 </div>
                 
                 <!-- X (Twitter) -->
-                <div class="mb-4">
-                    <span class="block text-sm md:text-base opacity-70 tracking-widest">X</span>
-                    <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest leading-none truncate">@...</span>
+                <div class="absolute top-[50%] left-[8%] md:left-[10%] w-[45%]">
+                    <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-md">@...</span>
                 </div>
                 
                 <!-- WALLET -->
-                <div>
-                    <span class="block text-sm md:text-base opacity-70 tracking-widest">WALLET</span>
-                    <span id="p-wallet" class="block text-lg md:text-xl tracking-widest leading-none">0x...</span>
+                <div class="absolute top-[65%] left-[8%] md:left-[10%] w-[45%]">
+                    <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-md">0x...</span>
                 </div>
 
             </div>
