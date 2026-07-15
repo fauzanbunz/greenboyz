@@ -69,17 +69,17 @@
             font-display: swap;
         }
 
-        /* IMPORT FONT WINDOW MARKERS (KHUSUS POP UP POSTER) */
+        /* IMPORT CUSTOM FONT BRICK UNTUK TIKET POPUP */
         @font-face {
-            font-family: 'WindowMarkers';
-            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/WindowMarkers.ttf') format('truetype');
+            font-family: 'Brick';
+            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/Brick.otf') format('opentype');
             font-weight: normal;
             font-style: normal;
             font-display: swap;
         }
-        
-        .font-window {
-            font-family: 'WindowMarkers', sans-serif;
+
+        .font-brick {
+            font-family: 'Brick', sans-serif;
         }
 
         body {
@@ -478,34 +478,37 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto mt-8 text-center md:text-left text-gray-700 text-xs font-mono">
-            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED. NOT FINANCIAL ADVICE.
+            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED.
         </div>
     </footer>
 
     <!-- POP UP SECURED - DESAIN TIKET POSTER DIGITAL -->
     <div id="popup-secured" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         
+        <!-- Tombol X untuk Menutup -->
+        <button onclick="document.getElementById('popup-secured').classList.replace('flex', 'hidden');" class="absolute top-6 right-6 text-white hover:text-neon transition-colors z-[110]">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <!-- Aspek rasio dan styling container disesuaikan agar gambar tidak terpotong -->
-        <div id="poster-capture" class="relative w-[300px] md:w-[380px] aspect-[3/4] border-[6px] border-[#CCFF00] bg-cover bg-center shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
+        <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden bg-cover bg-center" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
             
-            <!-- Pembungkus data dengan font Aerosoldier, huruf kapital semua -->
-            <div class="absolute inset-0 font-aerosoldier uppercase text-black">
+            <!-- Data Teks menggunakan Font Brick, Kapital, dan diposisikan secara presisi absolut -->
+            <div class="absolute inset-0 font-brick uppercase text-black">
                 
-                <!-- PASS ID -->
-                <!-- Posisikan secara absolut berdasarkan gambar -->
-                <div class="absolute top-[28%] left-[8%] md:left-[10%]">
-                    <span id="p-member" class="text-3xl md:text-4xl tracking-widest drop-shadow-md"># 0000</span>
+                <!-- ID Member (# 0000) - Diposisikan di area atas "PASS" -->
+                <div class="absolute top-[20%] left-[10%] md:left-[12%]">
+                    <span id="p-member" class="text-4xl md:text-5xl tracking-widest drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"># 0000</span>
                 </div>
                 
-                <!-- X (Twitter) -->
-                <div class="absolute top-[50%] left-[8%] md:left-[10%] w-[45%]">
-                    <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-md">@...</span>
+                <!-- Nama Twitter (@...) - Diposisikan di bawah tulisan PASS ID -->
+                <div class="absolute top-[38%] left-[10%] md:left-[12%] w-[50%]">
+                    <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">@...</span>
                 </div>
                 
-                <!-- WALLET -->
-                <div class="absolute top-[65%] left-[8%] md:left-[10%] w-[45%]">
-                    <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-md">0x...</span>
+                <!-- Alamat Wallet EVM - Diposisikan di bawah tulisan WALLET -->
+                <div class="absolute top-[68%] left-[10%] md:left-[12%] w-[50%]">
+                    <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">0x...</span>
                 </div>
 
             </div>
@@ -516,7 +519,7 @@
         <p class="text-neon font-mono text-sm mt-4 mb-2 text-center animate-pulse">download the picture and share it</p>
 
         <!-- ACTION BUTTONS POSTER -->
-        <div class="flex flex-col gap-3 mt-2 w-[300px] md:w-[380px] mb-10">
+        <div class="flex flex-col gap-3 mt-2 w-[340px] md:w-[500px] mb-10">
             <button onclick="postToX()" class="w-full bg-black border-2 border-white text-white font-aerosoldier text-2xl py-3 hover:bg-[#1DA1F2] hover:border-[#1DA1F2] transition flex justify-center items-center gap-2">
                 <!-- Icon Twitter / X -->
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
@@ -840,7 +843,6 @@
         });
 
         // --- SETTING LINK RAID (GANTI LINK INI DENGAN LINK TWEET ASLI ANDA) ---
-        // Contoh: "https://x.com/greenboyz_art/status/1234567890"
         const TARGET_TWEET_LINK = "https://x.com/greenboyz_art"; 
 
         function goToRaidTweet(taskNum) {
@@ -880,12 +882,6 @@
 
             if (document.getElementById('bot_check').value !== "") return; 
             
-            // --- FITUR CEGAH DOUBLE SUBMIT DINONAKTIFKAN SEMENTARA UNTUK TESTING ---
-            // if (localStorage.getItem('greenboyz_wl_submitted') === 'true') {
-            //     alert("DENIED: You have already secured a spot from this device. Multiple entries are restricted.");
-            //     return;
-            // }
-
             if(!wlTasks[1] || !wlTasks[2] || !wlTasks[3]) {
                 errorMsg.classList.remove('hidden');
                 return;
@@ -909,10 +905,6 @@
                 mode: 'no-cors'
             })
             .then(() => {
-                // --- PENGUNCIAN DEVICE DINONAKTIFKAN SEMENTARA ---
-                // localStorage.setItem('greenboyz_wl_submitted', 'true');
-                
-                // ISI DATA DINAMIS KE POSTER
                 const inputTwitter = document.querySelector('input[name="twitter"]').value.trim();
                 const inputWallet = document.querySelector('input[name="wallet"]').value.trim();
                 
@@ -936,13 +928,8 @@
 
         // --- FUNGSI TOMBOL DI POSTER TIKET (QUOTE TWEET) ---
         function postToX() {
-            // Teks yang akan ditulis otomatis oleh pengguna saat Quote
             const text = "The Park is Open, Lets join now @greenboyz_art\nHand-drawn NFTs identity. \nA collection of 1111 high-end fashion avatars redefining streetwear \nNative to @RobinhoodApp \nSubmit your deck on https://www.greenboyz.xyz/";
-            
-            // Format URL intent Twitter untuk melakukan QUOTE TWEET
-            // Parameter 'url' akan meletakkan link tweet yang dituju di akhir teks, menciptakan Quote
             const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(TARGET_TWEET_LINK)}`;
-            
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
@@ -955,11 +942,11 @@
             html2canvas(posterElement, {
                 useCORS: true, 
                 allowTaint: true,
-                scale: 2 
+                scale: 3 
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-                link.href = canvas.toDataURL('image/png');
+                link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
                 btnSave.innerText = "SAVED ✓";
                 setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
