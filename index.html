@@ -870,10 +870,13 @@
             e.preventDefault(); 
 
             if (document.getElementById('bot_check').value !== "") return; 
-            if (localStorage.getItem('greenboyz_wl_submitted') === 'true') {
-                alert("DENIED: You have already secured a spot from this device. Multiple entries are restricted.");
-                return;
-            }
+            
+            // --- FITUR CEGAH DOUBLE SUBMIT DINONAKTIFKAN SEMENTARA UNTUK TESTING ---
+            // if (localStorage.getItem('greenboyz_wl_submitted') === 'true') {
+            //     alert("DENIED: You have already secured a spot from this device. Multiple entries are restricted.");
+            //     return;
+            // }
+
             if(!wlTasks[1] || !wlTasks[2] || !wlTasks[3]) {
                 errorMsg.classList.remove('hidden');
                 return;
@@ -897,7 +900,8 @@
                 mode: 'no-cors'
             })
             .then(() => {
-                localStorage.setItem('greenboyz_wl_submitted', 'true');
+                // --- PENGUNCIAN DEVICE DINONAKTIFKAN SEMENTARA ---
+                // localStorage.setItem('greenboyz_wl_submitted', 'true');
                 
                 // ISI DATA DINAMIS KE POSTER
                 const inputTwitter = document.querySelector('input[name="twitter"]').value.trim();
