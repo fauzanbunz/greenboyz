@@ -493,22 +493,22 @@
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
         <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden bg-cover bg-center" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
             
-            <!-- Data Teks menggunakan Font Brick, Kapital, dan diposisikan secara presisi absolut -->
-            <div class="absolute inset-0 font-brick uppercase text-black">
+            <!-- Data Teks menggunakan Font Monospace standar untuk hasil download yang tajam -->
+            <div class="absolute inset-0 font-mono font-bold uppercase text-black">
                 
                 <!-- ID Member (# 0000) - Diposisikan di area atas "PASS" -->
                 <div class="absolute top-[45%] left-[10%] md:left-[12%]">
-                    <span id="p-member" class="text-4xl md:text-5xl tracking-widest drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"># 0000</span>
+                    <span id="p-member" class="text-3xl md:text-4xl tracking-widest drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"># 0000</span>
                 </div>
                 
                 <!-- Nama Twitter (@...) - Diposisikan di bawah tulisan PASS ID -->
                 <div class="absolute top-[65%] left-[10%] md:left-[12%] w-[50%]">
-                    <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">@...</span>
+                    <span id="p-twitter" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">@...</span>
                 </div>
                 
                 <!-- Alamat Wallet EVM - Diposisikan di bawah tulisan WALLET -->
                 <div class="absolute top-[78%] left-[10%] md:left-[12%] w-[50%]">
-                    <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">0x...</span>
+                    <span id="p-wallet" class="block text-base md:text-lg tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">0x...</span>
                 </div>
 
             </div>
@@ -947,14 +947,7 @@
             btnSave.disabled = true;
 
             try {
-                // 1. Pastikan SEMUA font custom (termasuk font Brick) sudah 100% selesai dimuat.
-                //    Kalau font belum siap saat di-capture, hasil download akan pakai font
-                //    pengganti (fallback) yang tampak beda/kabur dibanding tampilan popup asli.
-                if (document.fonts && document.fonts.ready) {
-                    await document.fonts.ready;
-                }
-
-                // 2. Pastikan gambar background tiket (wlpasss.png) benar-benar sudah full loaded,
+                // 1. Pastikan gambar background tiket (wlpasss.png) benar-benar sudah full loaded,
                 //    bukan cuma "sempat kelihatan" di layar. Ini penyebab utama hasil blur/pecah.
                 const bgImageUrl = getComputedStyle(posterElement).backgroundImage
                     .replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
@@ -968,10 +961,10 @@
                     });
                 }
 
-                // 3. Delay singkat agar browser selesai reflow/paint sebelum di-capture
+                // 2. Delay singkat agar browser selesai reflow/paint sebelum di-capture
                 await new Promise((resolve) => setTimeout(resolve, 300));
 
-                // 4. FIX PENTING: html2canvas punya bug terkenal saat meng-capture elemen
+                // 3. FIX PENTING: html2canvas punya bug terkenal saat meng-capture elemen
                 //    "position: fixed" (seperti popup tiket ini) kalau halaman utama sempat
                 //    di-scroll sebelumnya. Akibatnya hasil capture jadi kepotong/geser acak.
                 //    Solusinya: paksa halaman ke posisi paling atas, lalu kompensasi offset
@@ -979,12 +972,12 @@
                 window.scrollTo(0, 0);
                 await new Promise((resolve) => requestAnimationFrame(resolve));
 
-                // 5. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
+                // 4. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
                 //    supaya hasil download identik dengan yang tampil di popup.
                 const canvas = await html2canvas(posterElement, {
                     useCORS: true,
                     allowTaint: false,
-                    scale: 4, // <-- DIGANTI: Meningkatkan scale menjadi 4 untuk hasil High-Res / Anti-blur
+                    scale: 4, // <-- Tetap menggunakan 4 agar background dan text tajam
                     backgroundColor: null,
                     logging: false,
                     imageTimeout: 15000,
