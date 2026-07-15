@@ -419,7 +419,7 @@
                                 <span class="text-white font-mono text-sm uppercase">Like & RT this transmission</span>
                             </div>
                             <div class="flex gap-2 w-full md:w-auto">
-                                <a href=https://x.com/greenboyz_art/status/2076669056128790838?s=20 target="_blank" onclick="markTaskClicked(2)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                <button type="button" onclick="goToRaidTweet(2)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</button>
                                 <button type="button" id="btn-v2" onclick="verifyTask(2)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
                             </div>
                         </div>
@@ -432,7 +432,7 @@
                                     <span class="text-white font-mono text-sm uppercase leading-tight">Reply with tag 2 friends to skate 🛹</span>
                                 </div>
                                 <div class="flex gap-2 w-full md:w-auto">
-                                    <a href="https://x.com/greenboyz_art/status/2076669056128790838?s=20 target="_blank" onclick="markTaskClicked(3)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</a>
+                                    <button type="button" onclick="goToRaidTweet(3)" class="flex-1 md:flex-none text-center px-4 py-2 bg-white text-black font-bold text-xs uppercase hover:bg-neon transition-colors">GO TO X</button>
                                     <button type="button" id="btn-v3" onclick="verifyTask(3)" class="flex-1 md:flex-none px-4 py-2 border border-neon text-neon font-bold text-xs uppercase hover:bg-neon hover:text-black transition-colors">VERIFY</button>
                                 </div>
                             </div>
@@ -824,6 +824,15 @@
             revealElements.forEach(el => revealOnScroll.observe(el));
         });
 
+        // --- SETTING LINK RAID (GANTI LINK INI DENGAN LINK TWEET ASLI ANDA) ---
+        // Contoh: "https://x.com/greenboyz_art/status/1234567890"
+        const TARGET_TWEET_LINK = "https://x.com/greenboyz_art"; 
+
+        function goToRaidTweet(taskNum) {
+            markTaskClicked(taskNum);
+            window.open(TARGET_TWEET_LINK, '_blank', 'noopener,noreferrer');
+        }
+
         // --- WHITELIST FORM LOGIC & SECURITY ---
         let wlTasks = { 1: false, 2: false, 3: false };
         let clickedTasks = { 1: false, 2: false, 3: false };
@@ -910,11 +919,16 @@
             });
         });
 
-        // --- FUNGSI TOMBOL DI POSTER TIKET ---
+        // --- FUNGSI TOMBOL DI POSTER TIKET (QUOTE TWEET) ---
         function postToX() {
+            // Teks yang akan ditulis otomatis oleh pengguna saat Quote
             const text = "The Park is Open, Lets join now @greenboyz_art\nHand-drawn NFTs identity. \nA collection of 1111 high-end fashion avatars redefining streetwear \nNative to @RobinhoodApp \nSubmit your deck on https://www.greenboyz.xyz/";
-            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
+            
+            // Format URL intent Twitter untuk melakukan QUOTE TWEET
+            // Parameter 'url' akan meletakkan link tweet yang dituju di akhir teks, menciptakan Quote
+            const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(TARGET_TWEET_LINK)}`;
+            
+            window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
         function savePoster() {
