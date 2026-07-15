@@ -987,32 +987,6 @@
     }, 500); // Tunggu 500ms agar popup stabil
 }
 
-            // Jika gambar tidak bisa dimuat, tetap jalankan capture setelah delay 500ms
-            img.onerror = () => {
-                console.warn("Background image gagal dimuat, mencoba capture langsung...");
-                setTimeout(() => { /* Logika html2canvas di sini */ }, 500);
-            };
-        }
-
-            html2canvas(posterElement, options).then(canvas => {
-                const link = document.createElement('a');
-                link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-                link.href = canvas.toDataURL('image/png', 1.0);
-                link.click();
-                
-                btnSave.innerText = "SAVED ✓";
-                setTimeout(() => {
-                    btnSave.innerText = "SAVE POSTER";
-                    btnSave.disabled = false;
-                }, 2000);
-            }).catch(err => {
-                console.error(err);
-                alert("Terjadi kesalahan saat menyimpan gambar.");
-                btnSave.innerText = "SAVE POSTER";
-                btnSave.disabled = false;
-            });
-        }
-
         function resetProtocol() {
             window.location.reload();
         }
