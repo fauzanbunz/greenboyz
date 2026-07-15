@@ -60,16 +60,7 @@
         }
     </script>
     <style>
-        /* IMPORT CUSTOM FONT GRAFFITI AEROSOLDIER */
-        @font-face {
-            font-family: 'Aerosoldier';
-            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/AerosoldierDrip_PERSONAL_USE_ONLY.otf') format('opentype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* IMPORT FONT WINDOW MARKERS (KHUSUS POP UP POSTER) */
+        /* IMPORT FONT WINDOW MARKERS (KHUSUS POP UP POSTER LAMA - BISA DIHAPUS) */
         @font-face {
             font-family: 'WindowMarkers';
             src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/WindowMarkers.ttf') format('truetype');
@@ -77,9 +68,18 @@
             font-style: normal;
             font-display: swap;
         }
-        
-        .font-window {
-            font-family: 'WindowMarkers', sans-serif;
+
+        /* IMPORT CUSTOM FONT BRICK UNTUK TIKET POPUP */
+        @font-face {
+            font-family: 'Brick';
+            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/Brick.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        .font-brick {
+            font-family: 'Brick', sans-serif;
         }
 
         body {
@@ -486,26 +486,30 @@
     <div id="popup-secured" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <!-- Aspek rasio dan styling container disesuaikan agar gambar tidak terpotong -->
-        <div id="poster-capture" class="relative w-[300px] md:w-[380px] aspect-[3/4] border-[6px] border-[#CCFF00] bg-cover bg-center shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
+        <!-- Mengatur aspect-ratio spesifik agar gambar 100% pas tidak terpotong -->
+        <div id="poster-capture" class="relative w-[320px] md:w-[420px] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0" style="aspect-ratio: 1122 / 1402;">
             
-            <!-- Pembungkus data dengan font Aerosoldier, huruf kapital semua -->
-            <div class="absolute inset-0 font-aerosoldier uppercase text-black">
+            <!-- Gambar Background (Menggunakan <img> biasa agar tidak ter-crop oleh css background-cover) -->
+            <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png" class="absolute inset-0 w-full h-full object-contain -z-10" alt="Ticket Background">
+
+            <!-- Data Teks menggunakan Font Brick, Kapital, dan diposisikan secara presisi absolut -->
+            <!-- Teks diatur ukurannya lebih besar karena area canvas lebih luas -->
+            <div class="absolute inset-0 font-brick uppercase text-black">
                 
-                <!-- PASS ID -->
-                <!-- Posisikan secara absolut berdasarkan gambar -->
+                <!-- ID Member (Diatur posisi Top dan Left nya) -->
                 <div class="absolute top-[28%] left-[8%] md:left-[10%]">
-                    <span id="p-member" class="text-3xl md:text-4xl tracking-widest drop-shadow-md"># 0000</span>
+                    <span id="p-member" class="text-4xl md:text-5xl tracking-widest drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"># 0000</span>
                 </div>
                 
-                <!-- X (Twitter) -->
-                <div class="absolute top-[50%] left-[8%] md:left-[10%] w-[45%]">
-                    <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-md">@...</span>
+                <!-- Nama Twitter -->
+                <!-- Menambahkan bg-white/30 (tipis) opsional jika area kertasnya kotor, agar teks lebih terbaca -->
+                <div class="absolute top-[48%] left-[8%] md:left-[10%] w-[45%]">
+                    <span id="p-twitter" class="block text-2xl md:text-3xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">@...</span>
                 </div>
                 
-                <!-- WALLET -->
-                <div class="absolute top-[65%] left-[8%] md:left-[10%] w-[45%]">
-                    <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-md">0x...</span>
+                <!-- Alamat Wallet EVM -->
+                <div class="absolute top-[64%] left-[8%] md:left-[10%] w-[45%]">
+                    <span id="p-wallet" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">0x...</span>
                 </div>
 
             </div>
@@ -516,7 +520,7 @@
         <p class="text-neon font-mono text-sm mt-4 mb-2 text-center animate-pulse">download the picture and share it</p>
 
         <!-- ACTION BUTTONS POSTER -->
-        <div class="flex flex-col gap-3 mt-2 w-[300px] md:w-[380px] mb-10">
+        <div class="flex flex-col gap-3 mt-2 w-[320px] md:w-[420px] mb-10">
             <button onclick="postToX()" class="w-full bg-black border-2 border-white text-white font-aerosoldier text-2xl py-3 hover:bg-[#1DA1F2] hover:border-[#1DA1F2] transition flex justify-center items-center gap-2">
                 <!-- Icon Twitter / X -->
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
