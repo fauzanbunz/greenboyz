@@ -963,51 +963,48 @@
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
-        function savePoster() {
+        async function savePoster() {
             const btnSave = document.getElementById('btn-save');
             btnSave.innerText = "SAVING...";
 
-            // 1. Ambil data dari input form
             const id = document.getElementById('p-member').innerText;
             const twitter = document.getElementById('p-twitter').innerText;
             const wallet = document.getElementById('p-wallet').innerText;
 
-            // 2. Buat Canvas baru dengan ukuran asli gambar (1402 x 1122)
             const canvas = document.createElement('canvas');
             canvas.width = 1402;
             canvas.height = 1122;
             const ctx = canvas.getContext('2d');
 
-            // 3. Load gambar asli dari GitHub
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.src = 'https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png';
 
-            img.onload = function() {
-                // Gambar latar belakang
-                ctx.drawImage(img, 0, 0, 1402, 1122);
+            await img.decode();
+            ctx.drawImage(img, 0, 0, 1402, 1122);
 
-                // Pengaturan Font (Menggunakan font sistem yang mendekati atau font yang dimuat)
-                ctx.fillStyle = "black";
-                ctx.font = "bold 60px sans-serif"; // Sesuaikan ukuran font
+            // Menggunakan font Brick yang sudah di-load di halaman
+            ctx.fillStyle = "black";
+            ctx.font = "bold 60px 'Brick'"; 
 
-                // 4. Gambar teks di atas gambar (Koordinat disesuaikan dengan 1402x1122)
-                // (Anda bisa menyesuaikan angka ini agar pas dengan garis di gambar)
-                ctx.fillText(id, 250, 260);      // Koordinat ID
-                ctx.fillText(twitter, 250, 430); // Koordinat Twitter
-                ctx.fillText(wallet, 250, 680);  // Koordinat Wallet
+            // Posisi yang disesuaikan dengan gambar asli
+            // ID Member di baris atas
+            ctx.fillText(id, 150, 250); 
+            
+            // X (Twitter) di baris tengah
+            ctx.fillText(twitter, 150, 480);
+            
+            // Wallet di baris bawah
+            ctx.fillText(wallet, 150, 680);
 
-                // 5. Unduh
-                const link = document.createElement('a');
-                link.download = 'GREENBOYZ_WHITELIST_PASS.png';
-                link.href = canvas.toDataURL('image/png', 1.0);
-                link.click();
+            const link = document.createElement('a');
+            link.download = 'GREENBOYZ_WHITELIST_PASS.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
 
-                btnSave.innerText = "SAVED ✓";
-                setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
-            };
+            btnSave.innerText = "SAVED ✓";
+            setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
         }
-
         function resetProtocol() {
             window.location.reload();
         }
