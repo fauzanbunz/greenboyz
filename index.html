@@ -945,19 +945,19 @@
                 // Menggunakan Monospace bawaan sistem, tebal
                 ctx.font = 'bold ' + (canvas.height * 0.08) + 'px monospace'; 
                 const idX = canvas.width * 0.13;
-                const idY = canvas.height * 0.56; // Koordinat Y untuk PASS ID
+                const idY = canvas.height * 0.54; // Koordinat Y untuk PASS ID
                 ctx.fillText(ticketData.member, idX, idY);
 
                 // B. Render Twitter
                 ctx.font = 'bold ' + (canvas.height * 0.05) + 'px monospace'; 
                 const twX = canvas.width * 0.13;
-                const twY = canvas.height * 0.60; // Koordinat Y untuk Twitter
+                const twY = canvas.height * 0.64; // Koordinat Y untuk Twitter
                 ctx.fillText(ticketData.twitter, twX, twY);
 
                 // C. Render Wallet
                 ctx.font = 'bold ' + (canvas.height * 0.045) + 'px monospace'; 
                 const wlX = canvas.width * 0.13;
-                const wlY = canvas.height * 0.71; // Koordinat Y untuk Wallet
+                const wlY = canvas.height * 0.74; // Koordinat Y untuk Wallet
                 ctx.fillText(ticketData.wallet, wlX, wlY);
             };
             bgImg.src = TICKET_BG_URL;
