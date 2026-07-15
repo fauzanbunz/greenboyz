@@ -942,20 +942,14 @@
         return;
     }
 
-    // Ubah status tombol
     btnSave.innerText = "PROCESSING...";
     btnSave.disabled = true;
 
     try {
-        // 1. Pastikan SEMUA font custom (termasuk font Brick) sudah 100% selesai dimuat.
-        //    Kalau font belum siap saat di-capture, hasil download akan pakai font
-        //    pengganti (fallback) yang tampak beda/kabur dibanding tampilan popup asli.
         if (document.fonts && document.fonts.ready) {
             await document.fonts.ready;
         }
 
-        // 2. Pastikan gambar background tiket (wlpasss.png) benar-benar sudah full loaded,
-        //    bukan cuma "sempat kelihatan" di layar. Ini penyebab utama hasil blur/pecah.
         const bgImageUrl = getComputedStyle(posterElement).backgroundImage
             .replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
         if (bgImageUrl && bgImageUrl !== 'none') {
@@ -963,28 +957,23 @@
                 const preload = new Image();
                 preload.crossOrigin = 'anonymous';
                 preload.onload = resolve;
-                preload.onerror = resolve; // tetap lanjut agar tidak stuck jika gagal preload
+                preload.onerror = resolve;
                 preload.src = bgImageUrl;
             });
         }
 
-        // 3. Delay singkat agar browser selesai reflow/paint sebelum di-capture
         await new Promise((resolve) => setTimeout(resolve, 300));
-
-        // 4. FIX PENTING: html2canvas punya bug terkenal saat meng-capture elemen
-        //    "position: fixed" (seperti popup tiket ini) kalau halaman utama sempat
-        //    di-scroll sebelumnya. Akibatnya hasil capture jadi kepotong/geser acak.
-        //    Solusinya: paksa halaman ke posisi paling atas, lalu kompensasi offset
-        //    scroll ke html2canvas lewat scrollX/scrollY.
         window.scrollTo(0, 0);
         await new Promise((resolve) => requestAnimationFrame(resolve));
 
-        // 5. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
-        //    supaya hasil download identik dengan yang tampil di popup.
+        // Gunakan devicePixelRatio untuk scale agar hasil optimal di semua device
+        const scale = window.devicePixelRatio > 1 ? window.devicePixelRatio : 3;
+
+        // Capture dengan scale tinggi
         const canvas = await html2canvas(posterElement, {
             useCORS: true,
             allowTaint: false,
-            scale: 2, // resolusi HD yang aman & konsisten di semua device
+            scale: scale,
             backgroundColor: null,
             logging: false,
             imageTimeout: 15000,
@@ -994,9 +983,17 @@
             height: posterElement.offsetHeight
         });
 
+        // Nonaktifkan image smoothing agar hasil lebih tajam
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = canvas.width;
+        finalCanvas.height = canvas.height;
+        const ctx = finalCanvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(canvas, 0, 0);
+
         const link = document.createElement('a');
         link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-        link.href = canvas.toDataURL('image/png', 1.0);
+        link.href = finalCanvas.toDataURL('image/png', 1.0);
         link.click();
 
         btnSave.innerText = "SAVED ✓";
