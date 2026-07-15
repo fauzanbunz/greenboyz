@@ -933,7 +933,7 @@
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
-        function savePoster() {
+        async function savePoster() {
     const btnSave = document.getElementById('btn-save');
     const posterElement = document.getElementById('poster-capture');
 
@@ -946,45 +946,62 @@
     btnSave.innerText = "PROCESSING...";
     btnSave.disabled = true;
 
-    // Memberikan delay agar font dan CSS ter-render sempurna di browser
-    setTimeout(() => {
-        html2canvas(posterElement, {
+    try {
+        // 1. Pastikan SEMUA font custom (termasuk font Brick) sudah 100% selesai dimuat.
+        //    Kalau font belum siap saat di-capture, hasil download akan pakai font
+        //    pengganti (fallback) yang tampak beda/kabur dibanding tampilan popup asli.
+        if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+        }
+
+        // 2. Pastikan gambar background tiket (wlpasss.png) benar-benar sudah full loaded,
+        //    bukan cuma "sempat kelihatan" di layar. Ini penyebab utama hasil blur/pecah.
+        const bgImageUrl = getComputedStyle(posterElement).backgroundImage
+            .replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+        if (bgImageUrl && bgImageUrl !== 'none') {
+            await new Promise((resolve) => {
+                const preload = new Image();
+                preload.crossOrigin = 'anonymous';
+                preload.onload = resolve;
+                preload.onerror = resolve; // tetap lanjut agar tidak stuck jika gagal preload
+                preload.src = bgImageUrl;
+            });
+        }
+
+        // 3. Delay singkat agar browser selesai reflow/paint sebelum di-capture
+        await new Promise((resolve) => setTimeout(resolve, 300));
+
+        // 4. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
+        //    supaya hasil download identik dengan yang tampil di popup.
+        const canvas = await html2canvas(posterElement, {
             useCORS: true,
-            allowTaint: true,
-            scale: 3, // Kualitas HD agar teks tidak pecah
+            allowTaint: false,
+            scale: Math.max(window.devicePixelRatio || 1, 2) * 2, // resolusi HD, ikut layar device
             backgroundColor: null,
             logging: false,
-            // Memaksa lebar dan tinggi agar sesuai elemen asli
+            imageTimeout: 15000,
             width: posterElement.offsetWidth,
             height: posterElement.offsetHeight,
             windowWidth: posterElement.scrollWidth,
-            windowHeight: posterElement.scrollHeight,
-            onclone: (clonedDoc) => {
-                const clonedElement = clonedDoc.getElementById('poster-capture');
-                if (clonedElement) {
-                    clonedElement.style.transform = 'none';
-                    clonedElement.style.margin = '0';
-                    clonedElement.style.display = 'block';
-                }
-            }
-        }).then(canvas => {
-            const link = document.createElement('a');
-            link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-            
-            btnSave.innerText = "SAVED ✓";
-            setTimeout(() => {
-                btnSave.innerText = "SAVE POSTER";
-                btnSave.disabled = false;
-            }, 2000);
-        }).catch(err => {
-            console.error("Error html2canvas:", err);
-            alert("Gagal menyimpan gambar. Pastikan koneksi internet stabil.");
+            windowHeight: posterElement.scrollHeight
+        });
+
+        const link = document.createElement('a');
+        link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+
+        btnSave.innerText = "SAVED ✓";
+        setTimeout(() => {
             btnSave.innerText = "SAVE POSTER";
             btnSave.disabled = false;
-        });
-    }, 500); // Tunggu 500ms agar popup stabil
+        }, 2000);
+    } catch (err) {
+        console.error("Error html2canvas:", err);
+        alert("Gagal menyimpan gambar. Pastikan koneksi internet stabil.");
+        btnSave.innerText = "SAVE POSTER";
+        btnSave.disabled = false;
+    }
 }
 
         function resetProtocol() {
