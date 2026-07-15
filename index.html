@@ -495,7 +495,7 @@
             </div>
         </div>
         <div class="max-w-7xl mx-auto mt-8 text-center md:text-left text-gray-700 text-xs font-mono">
-            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED.
+            &copy; 2026 GREENBOYZ LABS. ALL RIGHTS RESERVED. NOT FINANCIAL ADVICE.
         </div>
     </footer>
 
@@ -503,27 +503,16 @@
     <div id="popup-secured" class="fixed inset-0 z-[100] bg-black/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
         
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <div id="poster-capture" class="relative w-[300px] md:w-[380px] border-[6px] border-[#CCFF00] bg-cover bg-center p-6 flex flex-col items-center shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/19877%20copy.png');">
+        <div id="poster-capture" class="relative w-[300px] md:w-[380px] h-[400px] md:h-[500px] border-[6px] border-[#CCFF00] bg-cover bg-center flex items-center justify-center shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-10 md:mt-0" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/xcxcxcx.png');">
             
-            <h2 class="font-window text-5xl md:text-6xl text-black mb-1 text-center mt-2 tracking-wide leading-none">SECURED</h2>
-            <p class="font-window text-black text-sm md:text-base text-center mb-6">welcome to the playground.</p>
-            
-            <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/1.jpg" alt="Avatar" class="w-40 h-40 md:w-48 md:h-48 object-cover border-4 border-black mb-6 shadow-xl">
-            
-            <!-- Data Field (Terisi otomatis saat disubmit) -->
-            <div class="w-full flex flex-col space-y-1 font-window text-black text-xs md:text-sm mb-6 bg-white/70 p-3 rounded-lg border-2 border-black">
-                <div class="flex justify-between border-b border-black/30 pb-1"><span>member #</span> <span id="p-member" class="font-bold">0000</span></div>
-                <div class="flex justify-between border-b border-black/30 pb-1 pt-1"><span>Twitter</span> <span id="p-twitter" class="font-bold truncate max-w-[140px]">@...</span></div>
-                <div class="flex justify-between border-b border-black/30 pb-1 pt-1"><span>Wallet</span> <span id="p-wallet" class="font-bold truncate max-w-[140px]">0x...</span></div>
-                <div class="flex justify-between border-b border-black/30 pb-1 pt-1"><span>chain</span> <span class="font-bold">Robinhoodchain</span></div>
-                <div class="flex justify-between pt-1"><span>Status</span> <span class="font-bold">approved</span></div>
+            <!-- Data Teks Rotasi 334 Derajat -->
+            <div class="flex flex-col items-center justify-center font-window text-[#CCFF00] text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" style="transform: rotate(334deg);">
+                <div id="p-member" class="text-5xl md:text-6xl mb-2 tracking-wider"># 0000</div>
+                <div id="p-twitter" class="text-2xl md:text-3xl mb-1 tracking-wide">@...</div>
+                <div id="p-wallet" class="text-lg md:text-xl mb-4 tracking-widest">0x...</div>
+                <div class="text-xl md:text-2xl tracking-widest">Status : Approved</div>
             </div>
             
-            <!-- Barcode Section -->
-            <div class="w-full bg-white/70 p-2 border-2 border-black">
-                <div class="css-barcode opacity-90"></div>
-                <div class="font-window text-black text-[11px] tracking-[0.35em] text-center font-bold mt-1" id="p-barcode-num">123456789012</div>
-            </div>
         </div>
 
         <!-- ACTION BUTTONS POSTER -->
@@ -918,11 +907,7 @@
                 document.getElementById('p-wallet').innerText = inputWallet.substring(0, 6) + '...' + inputWallet.substring(inputWallet.length - 4);
                 
                 const memberNum = Math.floor(Math.random() * 1111) + 1;
-                document.getElementById('p-member').innerText = memberNum.toString().padStart(4, '0');
-                
-                let barcode = '';
-                for(let i=0; i<12; i++) barcode += Math.floor(Math.random() * 10);
-                document.getElementById('p-barcode-num').innerText = barcode;
+                document.getElementById('p-member').innerText = '# ' + memberNum.toString().padStart(4, '0');
 
                 popupSecured.classList.remove('hidden');
                 popupSecured.classList.add('flex');
