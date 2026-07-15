@@ -934,51 +934,58 @@
         }
 
         function savePoster() {
-            const btnSave = document.getElementById('btn-save');
-            const posterElement = document.getElementById('poster-capture');
+    const btnSave = document.getElementById('btn-save');
+    const posterElement = document.getElementById('poster-capture');
 
-            if (!posterElement) {
-                alert("Poster tidak ditemukan!");
-                return;
+    if (!posterElement) {
+        console.error("Elemen 'poster-capture' tidak ditemukan.");
+        return;
+    }
+
+    // Ubah status tombol
+    btnSave.innerText = "PROCESSING...";
+    btnSave.disabled = true;
+
+    // Memberikan delay agar font dan CSS ter-render sempurna di browser
+    setTimeout(() => {
+        html2canvas(posterElement, {
+            useCORS: true,
+            allowTaint: true,
+            scale: 3, // Kualitas HD agar teks tidak pecah
+            backgroundColor: null,
+            logging: false,
+            // Memaksa lebar dan tinggi agar sesuai elemen asli
+            width: posterElement.offsetWidth,
+            height: posterElement.offsetHeight,
+            windowWidth: posterElement.scrollWidth,
+            windowHeight: posterElement.scrollHeight,
+            onclone: (clonedDoc) => {
+                const clonedElement = clonedDoc.getElementById('poster-capture');
+                if (clonedElement) {
+                    clonedElement.style.transform = 'none';
+                    clonedElement.style.margin = '0';
+                    clonedElement.style.display = 'block';
+                }
             }
-
-            btnSave.innerText = "PROCESSING...";
-            btnSave.disabled = true;
-
-            // Pastikan gambar background sudah benar-benar ter-load oleh browser
-            const bgImage = posterElement.style.backgroundImage;
-            const imgUrl = bgImage.replace(/url\(['"]?(.*?)['"]?\)/, '$1');
+        }).then(canvas => {
+            const link = document.createElement('a');
+            link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+            link.href = canvas.toDataURL('image/png', 1.0);
+            link.click();
             
-            const img = new Image();
-            img.src = imgUrl;
-
-            img.onload = () => {
-                // Setelah gambar dipastikan siap, baru kita jalankan html2canvas
-                html2canvas(posterElement, {
-                    useCORS: true, 
-                    allowTaint: true,
-                    scale: 3,
-                    backgroundColor: null,
-                    logging: false,
-                    // Hilangkan onclone jika sebelumnya menyebabkan blank picture
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-                    link.href = canvas.toDataURL('image/png', 1.0);
-                    link.click();
-                    
-                    btnSave.innerText = "SAVED ✓";
-                    setTimeout(() => {
-                        btnSave.innerText = "SAVE POSTER";
-                        btnSave.disabled = false;
-                    }, 2000);
-                }).catch(err => {
-                    console.error(err);
-                    alert("Gagal memproses gambar.");
-                    btnSave.innerText = "SAVE POSTER";
-                    btnSave.disabled = false;
-                });
-            };
+            btnSave.innerText = "SAVED ✓";
+            setTimeout(() => {
+                btnSave.innerText = "SAVE POSTER";
+                btnSave.disabled = false;
+            }, 2000);
+        }).catch(err => {
+            console.error("Error html2canvas:", err);
+            alert("Gagal menyimpan gambar. Pastikan koneksi internet stabil.");
+            btnSave.innerText = "SAVE POSTER";
+            btnSave.disabled = false;
+        });
+    }, 500); // Tunggu 500ms agar popup stabil
+}
 
             // Jika gambar tidak bisa dimuat, tetap jalankan capture setelah delay 500ms
             img.onerror = () => {
