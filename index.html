@@ -60,16 +60,7 @@
         }
     </script>
     <style>
-        /* IMPORT CUSTOM FONT GRAFFITI AEROSOLDIER */
-        @font-face {
-            font-family: 'Aerosoldier';
-            src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/AerosoldierDrip_PERSONAL_USE_ONLY.otf') format('opentype');
-            font-weight: normal;
-            font-style: normal;
-            font-display: swap;
-        }
-
-        /* IMPORT FONT WINDOW MARKERS (KHUSUS POP UP POSTER) */
+        /* IMPORT FONT WINDOW MARKERS (KHUSUS POP UP POSTER LAMA - BISA DIHAPUS) */
         @font-face {
             font-family: 'WindowMarkers';
             src: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/WindowMarkers.ttf') format('truetype');
@@ -85,10 +76,6 @@
             font-weight: normal;
             font-style: normal;
             font-display: swap;
-        }
-
-        .font-window {
-            font-family: 'WindowMarkers', sans-serif;
         }
 
         .font-brick {
@@ -511,17 +498,17 @@
             <div class="absolute inset-0 font-brick uppercase text-black">
                 
                 <!-- ID Member (# 0000) - Diposisikan di area atas "PASS" -->
-                <div class="absolute top-[50%] left-[10%] md:left-[12%]">
+                <div class="absolute top-[20%] left-[10%] md:left-[12%]">
                     <span id="p-member" class="text-4xl md:text-5xl tracking-widest drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"># 0000</span>
                 </div>
                 
                 <!-- Nama Twitter (@...) - Diposisikan di bawah tulisan PASS ID -->
-                <div class="absolute top-[63%] left-[10%] md:left-[12%] w-[50%]">
+                <div class="absolute top-[38%] left-[10%] md:left-[12%] w-[50%]">
                     <span id="p-twitter" class="block text-xl md:text-2xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">@...</span>
                 </div>
                 
                 <!-- Alamat Wallet EVM - Diposisikan di bawah tulisan WALLET -->
-                <div class="absolute top-[80%] left-[10%] md:left-[12%] w-[50%]">
+                <div class="absolute top-[68%] left-[10%] md:left-[12%] w-[50%]">
                     <span id="p-wallet" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">0x...</span>
                 </div>
 
@@ -963,48 +950,29 @@
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
-        async function savePoster() {
+        function savePoster() {
             const btnSave = document.getElementById('btn-save');
             btnSave.innerText = "SAVING...";
-
-            const id = document.getElementById('p-member').innerText;
-            const twitter = document.getElementById('p-twitter').innerText;
-            const wallet = document.getElementById('p-wallet').innerText;
-
-            const canvas = document.createElement('canvas');
-            canvas.width = 1402;
-            canvas.height = 1122;
-            const ctx = canvas.getContext('2d');
-
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.src = 'https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png';
-
-            await img.decode();
-            ctx.drawImage(img, 0, 0, 1402, 1122);
-
-            // Menggunakan font Brick yang sudah di-load di halaman
-            ctx.fillStyle = "black";
-            ctx.font = "bold 60px 'Brick'"; 
-
-            // Posisi yang disesuaikan dengan gambar asli
-            // ID Member di baris atas
-            ctx.fillText(id, 150, 250); 
             
-            // X (Twitter) di baris tengah
-            ctx.fillText(twitter, 150, 480);
+            const posterElement = document.getElementById('poster-capture');
             
-            // Wallet di baris bawah
-            ctx.fillText(wallet, 150, 680);
-
-            const link = document.createElement('a');
-            link.download = 'GREENBOYZ_WHITELIST_PASS.png';
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
-
-            btnSave.innerText = "SAVED ✓";
-            setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
+            html2canvas(posterElement, {
+                useCORS: true, 
+                allowTaint: true,
+                scale: 2 
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btnSave.innerText = "SAVED ✓";
+                setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
+            }).catch(err => {
+                alert("Failed to save poster. Please take a manual screenshot.");
+                btnSave.innerText = "SAVE POSTER";
+            });
         }
+
         function resetProtocol() {
             window.location.reload();
         }
