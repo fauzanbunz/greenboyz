@@ -13,7 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Library html2canvas untuk fitur "Save Poster" -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Library html2canvas Dihapus, kita akan menggunakan Native Canvas API -->
     
     <script>
         tailwind.config = {
@@ -490,29 +490,10 @@
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
-        <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden bg-cover bg-center" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
-            
-            <!-- Data Teks menggunakan Font Monospace standar untuk hasil download yang tajam -->
-            <div class="absolute inset-0 font-mono font-bold uppercase text-black">
-                
-                <!-- ID Member (# 0000) - Diposisikan di area atas "PASS" -->
-                <div class="absolute top-[45%] left-[10%] md:left-[12%]">
-                    <span id="p-member" class="text-3xl md:text-4xl tracking-widest drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]"># 0000</span>
-                </div>
-                
-                <!-- Nama Twitter (@...) - Diposisikan di bawah tulisan PASS ID -->
-                <div class="absolute top-[65%] left-[10%] md:left-[12%] w-[50%]">
-                    <span id="p-twitter" class="block text-lg md:text-xl tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">@...</span>
-                </div>
-                
-                <!-- Alamat Wallet EVM - Diposisikan di bawah tulisan WALLET -->
-                <div class="absolute top-[78%] left-[10%] md:left-[12%] w-[50%]">
-                    <span id="p-wallet" class="block text-base md:text-lg tracking-widest truncate drop-shadow-[0_1px_1px_rgba(255,255,255,0.5)]">0x...</span>
-                </div>
-
-            </div>
-            
+        <!-- AREA POSTER MENGGUNAKAN NATIVE CANVAS -->
+        <div class="relative w-[340px] md:w-[500px] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden">
+            <!-- Canvas sesungguhnya yang akan digambar dan diunduh -->
+            <canvas id="final-ticket-canvas" class="w-full h-auto block"></canvas>
         </div>
 
         <!-- Keterangan download -->
@@ -933,62 +914,133 @@
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
-        async function savePoster() {
-            const btnSave = document.getElementById('btn-save');
-            const posterElement = document.getElementById('poster-capture');
+        // Variabel untuk menyimpan data agar bisa digambar ulang ke canvas
+        let ticketData = { member: '', twitter: '', wallet: '' };
+        const TICKET_BG_URL = 'https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png';
 
-            if (!posterElement) {
-                console.error("Elemen 'poster-capture' tidak ditemukan.");
+        // Fungsi baru untuk menggambar tiket ke Native Canvas
+        function renderTicketToCanvas() {
+            const canvas = document.getElementById('final-ticket-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            const bgImg = new Image();
+            bgImg.crossOrigin = "anonymous";
+            bgImg.onload = () => {
+                // Set ukuran canvas aktual (resolusi asli gambar untuk ketajaman maksimal)
+                canvas.width = bgImg.width;
+                canvas.height = bgImg.height;
+
+                // 1. Gambar Background
+                ctx.drawImage(bgImg, 0, 0, canvas.width, canvas.height);
+
+                // 2. Setup Font & Style Dasar
+                ctx.fillStyle = '#000000'; // Warna teks hitam
+                ctx.textBaseline = 'middle'; // Memudahkan penempatan vertikal
+                
+                // --- Koordinat & Ukuran berdasarkan rasio gambar asli ---
+                // Anda mungkin perlu menyesuaikan nilai 'y' sedikit jika font terlihat naik/turun
+
+                // A. Render Member ID
+                // Menggunakan Monospace bawaan sistem, tebal
+                ctx.font = 'bold ' + (canvas.height * 0.08) + 'px monospace'; 
+                const idX = canvas.width * 0.13;
+                const idY = canvas.height * 0.52; // Koordinat Y untuk PASS ID
+                ctx.fillText(ticketData.member, idX, idY);
+
+                // B. Render Twitter
+                ctx.font = 'bold ' + (canvas.height * 0.05) + 'px monospace'; 
+                const twX = canvas.width * 0.13;
+                const twY = canvas.height * 0.69; // Koordinat Y untuk Twitter
+                ctx.fillText(ticketData.twitter, twX, twY);
+
+                // C. Render Wallet
+                ctx.font = 'bold ' + (canvas.height * 0.045) + 'px monospace'; 
+                const wlX = canvas.width * 0.13;
+                const wlY = canvas.height * 0.81; // Koordinat Y untuk Wallet
+                ctx.fillText(ticketData.wallet, wlX, wlY);
+            };
+            bgImg.src = TICKET_BG_URL;
+        }
+
+        // Modifikasi event submit form untuk menggunakan sistem canvas baru
+        form.addEventListener('submit', (e) => {
+            e.preventDefault(); 
+
+            if (document.getElementById('bot_check').value !== "") return; 
+            
+            if(!wlTasks[1] || !wlTasks[2] || !wlTasks[3]) {
+                errorMsg.classList.remove('hidden');
                 return;
             }
 
-            // Ubah status tombol
+            const walletVal = document.querySelector('input[name="wallet"]').value.trim();
+            if (!/^0x[a-fA-F0-9]{40}$/.test(walletVal)) {
+                alert("INVALID FORMAT: Please enter a valid EVM Wallet Address (must start with '0x' followed by 40 characters).");
+                return;
+            }
+
+            submitBtn.innerText = "SENDING...";
+            submitBtn.disabled = true;
+            submitBtn.classList.replace('bg-neon', 'bg-gray-500');
+
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors'
+            })
+            .then(() => {
+                const inputTwitter = document.querySelector('input[name="twitter"]').value.trim();
+                const inputWallet = document.querySelector('input[name="wallet"]').value.trim();
+                const memberNum = Math.floor(Math.random() * 1111) + 1;
+                
+                // Simpan data untuk dirender ke canvas
+                ticketData = {
+                    member: '# ' + memberNum.toString().padStart(4, '0'),
+                    twitter: inputTwitter,
+                    wallet: inputWallet.substring(0, 6) + '...' + inputWallet.substring(inputWallet.length - 4)
+                };
+
+                // Render gambar ke canvas
+                renderTicketToCanvas();
+
+                popupSecured.classList.remove('hidden');
+                popupSecured.classList.add('flex');
+                
+                // Reset tombol submit jika user menutup popup
+                submitBtn.innerText = "SUBMIT DATA";
+                submitBtn.disabled = false;
+                submitBtn.classList.replace('bg-gray-500', 'bg-neon');
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert("Transmission failed. Please check your connection and try again.");
+                submitBtn.innerText = "SUBMIT DATA";
+                submitBtn.disabled = false;
+                submitBtn.classList.replace('bg-gray-500', 'bg-neon');
+            });
+        });
+
+
+        async function savePoster() {
+            const btnSave = document.getElementById('btn-save');
+            const canvas = document.getElementById('final-ticket-canvas');
+
+            if (!canvas) {
+                console.error("Canvas tidak ditemukan.");
+                return;
+            }
+
             btnSave.innerText = "PROCESSING...";
             btnSave.disabled = true;
 
             try {
-                // 1. Pastikan gambar background tiket (wlpasss.png) benar-benar sudah full loaded,
-                //    bukan cuma "sempat kelihatan" di layar. Ini penyebab utama hasil blur/pecah.
-                const bgImageUrl = getComputedStyle(posterElement).backgroundImage
-                    .replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
-                if (bgImageUrl && bgImageUrl !== 'none') {
-                    await new Promise((resolve) => {
-                        const preload = new Image();
-                        preload.crossOrigin = 'anonymous';
-                        preload.onload = resolve;
-                        preload.onerror = resolve; // tetap lanjut agar tidak stuck jika gagal preload
-                        preload.src = bgImageUrl;
-                    });
-                }
-
-                // 2. Delay singkat agar browser selesai reflow/paint sebelum di-capture
-                await new Promise((resolve) => setTimeout(resolve, 300));
-
-                // 3. FIX PENTING: html2canvas punya bug terkenal saat meng-capture elemen
-                //    "position: fixed" (seperti popup tiket ini) kalau halaman utama sempat
-                //    di-scroll sebelumnya. Akibatnya hasil capture jadi kepotong/geser acak.
-                //    Solusinya: paksa halaman ke posisi paling atas, lalu kompensasi offset
-                //    scroll ke html2canvas lewat scrollX/scrollY.
-                window.scrollTo(0, 0);
-                await new Promise((resolve) => requestAnimationFrame(resolve));
-
-                // 4. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
-                //    supaya hasil download identik dengan yang tampil di popup.
-                const canvas = await html2canvas(posterElement, {
-                    useCORS: true,
-                    allowTaint: false,
-                    scale: 4, // <-- Tetap menggunakan 4 agar background dan text tajam
-                    backgroundColor: null,
-                    logging: false,
-                    imageTimeout: 15000,
-                    scrollX: -window.scrollX,
-                    scrollY: -window.scrollY,
-                    width: posterElement.offsetWidth,
-                    height: posterElement.offsetHeight
-                });
-
+                // Proses download dari Native Canvas jauh lebih instan dan bersih
                 const link = document.createElement('a');
                 link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+                // Mengambil data gambar dengan resolusi penuh dari canvas
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
 
@@ -998,7 +1050,7 @@
                     btnSave.disabled = false;
                 }, 2000);
             } catch (err) {
-                console.error("Error html2canvas:", err);
+                console.error("Error saving canvas:", err);
                 alert("Gagal menyimpan gambar. Pastikan koneksi internet stabil.");
                 btnSave.innerText = "SAVE POSTER";
                 btnSave.disabled = false;
