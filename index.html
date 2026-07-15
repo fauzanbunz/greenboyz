@@ -491,16 +491,7 @@
         </button>
 
         <!-- AREA POSTER YANG AKAN DI-CAPTURE OLEH HTML2CANVAS -->
-        <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden" style="background-color:#000;">
-    <!-- FIX: Gunakan <img> agar html2canvas bisa render background dengan benar -->
-    <img src="https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png"
-         crossorigin="anonymous"
-         alt="WL Pass Background"
-         class="absolute inset-0 w-full h-full object-cover object-center"
-         id="poster-bg-img">
-    <!-- ...elemen teks lain tetap seperti semula... -->
-</div>
-
+        <div id="poster-capture" class="relative w-[340px] md:w-[500px] aspect-[4/3] border-[6px] border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.4)] mt-8 md:mt-0 overflow-hidden bg-cover bg-center" style="background-image: url('https://raw.githubusercontent.com/fauzanbunz/greenboyz/main/wlpasss.png');">
             
             <!-- Data Teks menggunakan Font Brick, Kapital, dan diposisikan secara presisi absolut -->
             <div class="absolute inset-0 font-brick uppercase text-black">
@@ -942,54 +933,84 @@
             window.open(intentUrl, '_blank', 'noopener,noreferrer');
         }
 
-       async function savePoster() {
-    const btnSave = document.getElementById('btn-save');
-    const posterElement = document.getElementById('poster-capture');
-    const bgImg = document.getElementById('poster-bg-img');
+        async function savePoster() {
+            const btnSave = document.getElementById('btn-save');
+            const posterElement = document.getElementById('poster-capture');
 
-    if (!posterElement || !bgImg) {
-        alert("Elemen poster tidak ditemukan.");
-        return;
-    }
+            if (!posterElement) {
+                console.error("Elemen 'poster-capture' tidak ditemukan.");
+                return;
+            }
 
-    btnSave.innerText = "PROCESSING...";
-    btnSave.disabled = true;
+            // Ubah status tombol
+            btnSave.innerText = "PROCESSING...";
+            btnSave.disabled = true;
 
-    // Pastikan gambar background sudah load
-    if (!bgImg.complete) {
-        await new Promise(resolve => { bgImg.onload = resolve; bgImg.onerror = resolve; });
-    }
+            try {
+                // 1. Pastikan SEMUA font custom (termasuk font Brick) sudah 100% selesai dimuat.
+                //    Kalau font belum siap saat di-capture, hasil download akan pakai font
+                //    pengganti (fallback) yang tampak beda/kabur dibanding tampilan popup asli.
+                if (document.fonts && document.fonts.ready) {
+                    await document.fonts.ready;
+                }
 
-    // Tunggu 2 frame agar DOM benar-benar siap
-    await new Promise(r => requestAnimationFrame(r));
-    await new Promise(r => requestAnimationFrame(r));
+                // 2. Pastikan gambar background tiket (wlpasss.png) benar-benar sudah full loaded,
+                //    bukan cuma "sempat kelihatan" di layar. Ini penyebab utama hasil blur/pecah.
+                const bgImageUrl = getComputedStyle(posterElement).backgroundImage
+                    .replace(/^url\(["']?/, '').replace(/["']?\)$/, '');
+                if (bgImageUrl && bgImageUrl !== 'none') {
+                    await new Promise((resolve) => {
+                        const preload = new Image();
+                        preload.crossOrigin = 'anonymous';
+                        preload.onload = resolve;
+                        preload.onerror = resolve; // tetap lanjut agar tidak stuck jika gagal preload
+                        preload.src = bgImageUrl;
+                    });
+                }
 
-    // Scale minimal 3x untuk hasil tajam
-    const scale = Math.max(window.devicePixelRatio || 1, 3);
+                // 3. Delay singkat agar browser selesai reflow/paint sebelum di-capture
+                await new Promise((resolve) => setTimeout(resolve, 300));
 
-    const canvas = await html2canvas(posterElement, {
-        useCORS: true,
-        allowTaint: false,
-        scale: scale,
-        backgroundColor: '#000000',
-        imageTimeout: 20000,
-        foreignObjectRendering: false,
-        logging: false
-    });
+                // 4. FIX PENTING: html2canvas punya bug terkenal saat meng-capture elemen
+                //    "position: fixed" (seperti popup tiket ini) kalau halaman utama sempat
+                //    di-scroll sebelumnya. Akibatnya hasil capture jadi kepotong/geser acak.
+                //    Solusinya: paksa halaman ke posisi paling atas, lalu kompensasi offset
+                //    scroll ke html2canvas lewat scrollX/scrollY.
+                window.scrollTo(0, 0);
+                await new Promise((resolve) => requestAnimationFrame(resolve));
 
-    // Langsung gunakan hasil canvas dari html2canvas
-    const link = document.createElement('a');
-    link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-    link.href = canvas.toDataURL('image/png', 1.0);
-    link.click();
+                // 5. Capture PERSIS elemen tiket, tanpa mengubah style apa pun (onclone dihapus)
+                //    supaya hasil download identik dengan yang tampil di popup.
+                const canvas = await html2canvas(posterElement, {
+                    useCORS: true,
+                    allowTaint: false,
+                    scale: 4, // <-- DIGANTI: Meningkatkan scale menjadi 4 untuk hasil High-Res / Anti-blur
+                    backgroundColor: null,
+                    logging: false,
+                    imageTimeout: 15000,
+                    scrollX: -window.scrollX,
+                    scrollY: -window.scrollY,
+                    width: posterElement.offsetWidth,
+                    height: posterElement.offsetHeight
+                });
 
-    btnSave.innerText = "SAVED ✓";
-    setTimeout(() => {
-        btnSave.innerText = "SAVE POSTER";
-        btnSave.disabled = false;
-    }, 2000);
-}
+                const link = document.createElement('a');
+                link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
 
+                btnSave.innerText = "SAVED ✓";
+                setTimeout(() => {
+                    btnSave.innerText = "SAVE POSTER";
+                    btnSave.disabled = false;
+                }, 2000);
+            } catch (err) {
+                console.error("Error html2canvas:", err);
+                alert("Gagal menyimpan gambar. Pastikan koneksi internet stabil.");
+                btnSave.innerText = "SAVE POSTER";
+                btnSave.disabled = false;
+            }
+        }
 
         function resetProtocol() {
             window.location.reload();
