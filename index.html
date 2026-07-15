@@ -937,44 +937,53 @@
             const btnSave = document.getElementById('btn-save');
             const posterElement = document.getElementById('poster-capture');
 
-            if (!posterElement) {
-                alert("Poster tidak ditemukan!");
-                return;
-            }
+            if (!posterElement) return;
 
             btnSave.innerText = "PROCESSING...";
             btnSave.disabled = true;
 
-            // Menggunakan timeout kecil agar rendering CSS selesai diproses browser
-            setTimeout(() => {
-                html2canvas(posterElement, {
-                    useCORS: true, 
-                    allowTaint: true,
-                    scale: 3, // Skala 3 untuk hasil kualitas tinggi (HD)
-                    backgroundColor: null,
-                    logging: false,
-                    // Memastikan ukuran diambil dari offset agar tidak terpotong
-                    width: posterElement.offsetWidth,
-                    height: posterElement.offsetHeight,
-                    windowWidth: document.documentElement.offsetWidth
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-                    link.href = canvas.toDataURL('image/png', 1.0);
-                    link.click();
-                    
-                    btnSave.innerText = "SAVED ✓";
-                    setTimeout(() => {
-                        btnSave.innerText = "SAVE POSTER";
-                        btnSave.disabled = false;
-                    }, 2000);
-                }).catch(err => {
-                    console.error("Gagal menyimpan:", err);
-                    alert("Gagal memproses gambar. Pastikan tidak ada konten yang diblokir oleh browser.");
+            // 1. Simpan state scroll asli
+            const scrollY = window.scrollY;
+
+            // 2. Konfigurasi agar html2canvas menangkap elemen dengan akurat
+            const options = {
+                useCORS: true,
+                allowTaint: true,
+                scale: 3, // Kualitas tinggi
+                backgroundColor: null,
+                logging: false,
+                // Mengatasi masalah elemen yang tidak terlihat atau terpotong
+                windowWidth: posterElement.scrollWidth,
+                windowHeight: posterElement.scrollHeight,
+                x: posterElement.offsetLeft,
+                y: posterElement.offsetTop,
+                // Memastikan font dimuat sebelum capture
+                onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById('poster-capture');
+                    if (clonedElement) {
+                        clonedElement.style.transform = 'none';
+                        clonedElement.style.margin = '0';
+                    }
+                }
+            };
+
+            html2canvas(posterElement, options).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                
+                btnSave.innerText = "SAVED ✓";
+                setTimeout(() => {
                     btnSave.innerText = "SAVE POSTER";
                     btnSave.disabled = false;
-                });
-            }, 500);
+                }, 2000);
+            }).catch(err => {
+                console.error(err);
+                alert("Terjadi kesalahan saat menyimpan gambar.");
+                btnSave.innerText = "SAVE POSTER";
+                btnSave.disabled = false;
+            });
         }
 
         function resetProtocol() {
