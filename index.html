@@ -969,18 +969,24 @@
             
             const posterElement = document.getElementById('poster-capture');
             
+            // Konfigurasi untuk meningkatkan resolusi agar tidak buram
             html2canvas(posterElement, {
                 useCORS: true, 
                 allowTaint: true,
-                scale: 2 
+                scale: 3,           // Menaikkan resolusi 3x lipat agar tajam
+                logging: false,
+                backgroundColor: null 
             }).then(canvas => {
                 const link = document.createElement('a');
-                link.download = 'GREENBOYZ_WHITELIST_TICKET.png';
-                link.href = canvas.toDataURL('image/png');
+                link.download = 'GREENBOYZ_WL_PASS.png';
+                // Kualitas 1.0 = 100% (tidak dikompres)
+                link.href = canvas.toDataURL('image/png', 1.0); 
                 link.click();
+                
                 btnSave.innerText = "SAVED ✓";
                 setTimeout(() => btnSave.innerText = "SAVE POSTER", 2000);
             }).catch(err => {
+                console.error(err);
                 alert("Failed to save poster. Please take a manual screenshot.");
                 btnSave.innerText = "SAVE POSTER";
             });
